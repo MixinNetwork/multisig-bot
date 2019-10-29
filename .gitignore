@@ -1,0 +1,5 @@
+node_modules/
+dist/
+api/_site
+.sass-cache
+.jekyll-cache
