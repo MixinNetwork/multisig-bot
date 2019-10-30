@@ -13,7 +13,7 @@ const webRoot = function (env) {
   if (env === 'production') {
     return 'https://multisig.mixin.zone';
   } else {
-    return 'http://multisig.mixin.local';
+    return 'http://multisig.local';
   }
 };
 

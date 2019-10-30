@@ -24,7 +24,7 @@ Auth.prototype = {
       if (resp.error) {
         return false;
       }
-      self.router.replace('/dashboard');
+      self.router.replace('/');
     }, authorizationCode);
   },
 
@@ -35,7 +35,7 @@ Auth.prototype = {
       if (resp.error != null && resp.error != undefined) {
         self.api.notify('error', i18n.t('general.errors.'+resp.error.code));
       }
-      self.router.replace('/dashboard');
+      self.router.replace('/');
     }, code);
   }
 };

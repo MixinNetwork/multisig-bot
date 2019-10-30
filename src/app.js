@@ -40,7 +40,7 @@ router.on({
     new Auth(router, api).render();
   },
   '/': function () {
-    new Home(router).index();
+    new Home(router, api).index();
   }
 }).notFound(function () {
   $('#layout-container').html(Error404());

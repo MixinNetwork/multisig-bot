@@ -1,9 +1,10 @@
 import './index.scss';
 import $ from 'jquery';
 
-function Home(router) {
+function Home(router, api) {
   this.router = router;
   this.templateIndex = require('./index.html');
+  this.api = api;
 }
 
 Home.prototype = {
@@ -14,6 +15,9 @@ Home.prototype = {
       logoLargeURL: require('./logo-large.png'),
       logoSmallURL: require('./logo-small.png')
     }));
+    self.api.account.me(function(resp) {
+      console.log(resp);
+    });
     self.router.updatePageLinks();
   }
 };

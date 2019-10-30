@@ -6,9 +6,6 @@ function API(router, root) {
   this.router = router;
   this.root = root;
   this.account = new Account(this);
-  this.app = new App(this);
-  this.asset = new Asset(this);
-  this.github = new Github(this);
   this.Error404 = require('../404.html');
   this.ErrorGeneral = require('../error.html');
 }
@@ -56,7 +53,7 @@ API.prototype = {
       switch (resp.error.code) {
         case 401:
           this.account.clear();
-          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+APPS:READ+APPS:WRITE&response_type=code&redirect_uri=https://developers.mixin.one/auth');
+          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+ASSETS:READ&response_type=code&code_challenge='+this.account.challenge());
           break;
         case 404:
           $('#layout-container').html(this.Error404());

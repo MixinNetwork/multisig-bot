@@ -1,3 +1,7 @@
+import sha256 from 'crypto-js/sha256';
+import Base64 from 'crypto-js/enc-base64';
+var CryptoJS = require("crypto-js");
+
 function Account(api) {
   this.api = api;
 }
@@ -6,11 +10,12 @@ Account.prototype = {
   authenticate: function (callback, authorizationCode) {
     var params = {
       "client_id": CLIENT_ID,
-      "code": authorizationCode
+      "code": authorizationCode,
+      "code_verifier": window.localStorage.getItem("verifier")
     };
     this.api.request('POST', '/oauth/token', params, function(resp) {
       if (resp.data) {
-        if (resp.data.scope.indexOf('APPS:READ') < 0 || resp.data.scope.indexOf('APPS:WRITE') < 0) {
+        if (resp.data.scope.indexOf('ASSETS:READ') < 0) {
           resp.error = { code: 403, description: 'Access denied.' };
           return callback(resp);
         }
@@ -20,34 +25,18 @@ Account.prototype = {
     });
   },
 
-  transfers: function (callback, token, params) {
-    this.api.requestWithToken('POST', '/transfers', params, token, function(resp) {
-      callback(resp);
-    });
-  },
-
-  transactions: function (callback, token, params) {
-    this.api.requestWithToken('POST', '/transactions', params, token, function(resp) {
-      callback(resp);
-    });
-  },
-
-  snapshots: function (callback, token, id) {
-    this.api.requestWithToken('GET', '/snapshots/'+id, undefined, token, function(resp) {
-      callback(resp);
-    });
-  },
-
-  search: function (callback, id, token) {
-    this.api.requestWithToken('GET', '/search/'+id, undefined, token, function(resp) {
-      callback(resp);
-    });
-  },
-
   me: function (callback) {
     this.api.request('GET', '/me', undefined, function(resp) {
       callback(resp);
     });
+  },
+
+  challenge: function () {
+    var wordArray = CryptoJS.lib.WordArray.random(32);
+    var verifier = this.base64URLEncode(wordArray);
+    var challenge = this.base64URLEncode(this.sha256(wordArray));
+    window.localStorage.setItem('verifier', verifier);
+    return challenge;
   },
 
   token: function () {
@@ -58,16 +47,23 @@ Account.prototype = {
     return str;
   },
 
-  github: function () {
-    return window.localStorage.getItem('github');
-  },
-
   clear: function (callback) {
     window.localStorage.clear();
     if (typeof callback === 'function') {
       callback();
     }
-  }
+  },
+
+  base64URLEncode: function (str) {
+    return Base64.stringify(str)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  },
+
+  sha256: function (buffer) {
+    return sha256(buffer);
+  },
 };
 
 export default Account;
