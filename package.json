@@ -4,19 +4,14 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
-    "croppie": "^2.6.4",
     "crypto-js": "^3.1.9-1",
     "handlebars": "^4.4.5",
-    "int64-buffer": "^0.99.1007",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
     "navigo": "^7.1.2",
-    "node-forge": "^0.9.1",
     "node-polyglot": "^2.4.0",
     "noty": "^3.2.0-beta",
     "simple-line-icons": "^2.4.1",
-    "to": "^0.2.9",
-    "uuid": "^3.3.3",
     "validator": "^11.1.0"
   },
   "devDependencies": {

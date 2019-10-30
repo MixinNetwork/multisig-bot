@@ -12,15 +12,21 @@ function Home(router, api) {
 Home.prototype = {
   index: function () {
     const self = this;
-    self.api.account.conversation(function(resp) {
-      console.log(resp);
+    self.loadConversation(function(resp) {
       $('body').attr('class', 'home layout');
       if (resp.error && resp.error.code === 404 || resp.data && resp.data.category !== 'GROUP') {
         $('#layout-container').html(self.templateGuide());
         return true;
       } else if (resp.data && resp.data.category === 'GROUP') {
         self.loadUsers(resp.data.participants, function (users) {
-          self.renderWallet(resp.data, users);
+          self.loadUTXOs(undefined, resp.data, {}, function (utxos) {
+            if (Object.keys(utxos).length == 0) {
+              return;
+            }
+            self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
+              self.renderWallet(users, assets, utxos);
+            });
+          });
         });
         return true;
       }
@@ -28,21 +34,8 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
-  renderWallet: function (conv, users) {
+  renderWallet: function (users, assets, utxos) {
     const self = this;
-    console.log(users);
-    for (var i in users) {
-      console.log(users[i]);
-    }
-    self.loadUTXOs(undefined, conv, {}, function (utxos) {
-      if (Object.keys(utxos).length == 0) {
-        return;
-      }
-      self.loadAssets(0, Object.keys(utxos), [], function (assets) {
-        console.log(assets);
-      });
-      console.log(utxos);
-    });
   },
 
   loadUTXOs: function (offset, conv, filter, callback) {
@@ -88,7 +81,7 @@ Home.prototype = {
       if (resp.error) {
         return false;
       }
-      output.push(resp.data);
+      output[resp.data.asset_id] = resp.data;
       self.loadAssets(offset+1, ids, output, callback);
     });
   },
@@ -109,6 +102,22 @@ Home.prototype = {
         return callback(resp.data);
       }
     });
+  },
+
+  loadConversation: function (callback, id) {
+    const self = this;
+    const key = 'conversation-' + id;
+    var conv = localStorage.getItem(key);
+    if (conv) {
+      return callback({data:JSON.parse(conv)});
+    }
+    self.api.account.conversation(function(resp) {
+      if (resp.error) {
+        return callback(resp);
+      }
+      localStorage.setItem(key, JSON.stringify(resp.data));
+      return callback(resp);
+    }, id);
   },
 
   parseThreshold: function (name) {
