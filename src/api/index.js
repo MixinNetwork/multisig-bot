@@ -1,11 +1,13 @@
 import $ from 'jquery';
 import Noty from 'noty';
 import Account from './account.js';
+import Multisig from './multisig.js';
 
 function API(router, root) {
   this.router = router;
   this.root = root;
   this.account = new Account(this);
+  this.multisig = new Multisig(this);
   this.Error404 = require('../404.html');
   this.ErrorGeneral = require('../error.html');
 }
