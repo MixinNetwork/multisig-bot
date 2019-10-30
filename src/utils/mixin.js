@@ -9,6 +9,29 @@ function Mixin() {
 }
 
 Mixin.prototype = {
+  environment: function () {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.MixinContext) {
+      return 'iOS';
+    }
+    if (window.MixinContext && window.MixinContext.getContext) {
+      return 'Android';
+    }
+    return undefined;
+  },
+
+  conversationId: function () {
+    switch (this.environment()) {
+      case 'iOS':
+        var ctx = prompt('MixinContext.getContext()');
+        return JSON.parse(ctx).conversation_id;
+      case 'Android':
+        var ctx = window.MixinContext.getContext();
+        return JSON.parse(ctx).conversation_id;
+      default:
+        return undefined;
+    }
+  },
+
   signAuthenticationToken: function (uid, sid, privateKey, method, uri, body) {
     if (typeof(body) === "object") {
       body = JSON.stringify(body);

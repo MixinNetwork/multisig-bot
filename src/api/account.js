@@ -25,9 +25,9 @@ Account.prototype = {
     });
   },
 
-  me: function (callback) {
-    this.api.request('GET', '/me', undefined, function(resp) {
-      callback(resp);
+  conversation: function (callback, id) {
+    this.api.request('GET', '/conversations/'+id, undefined, function(resp) {
+      return callback(resp);
     });
   },
 
