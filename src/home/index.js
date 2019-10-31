@@ -1,11 +1,13 @@
 import './index.scss';
 import $ from 'jquery';
+import Decimal from 'decimal.js';
 import Mixin from '../utils/mixin';
 
 function Home(router, api) {
   this.router = router;
   this.templateIndex = require('./index.html');
   this.templateGuide = require('./guide.html');
+  this.partialBalanceItem = require('./balance.html');
   this.api = api;
 }
 
@@ -13,8 +15,8 @@ Home.prototype = {
   index: function () {
     const self = this;
     self.loadConversation(function(resp) {
-      $('body').attr('class', 'home layout');
       if (resp.error && resp.error.code === 404 || resp.data && resp.data.category !== 'GROUP') {
+        $('body').attr('class', 'home layout');
         $('#layout-container').html(self.templateGuide());
         return true;
       } else if (resp.data && resp.data.category === 'GROUP') {
@@ -36,6 +38,22 @@ Home.prototype = {
 
   renderWallet: function (users, assets, utxos) {
     const self = this;
+    $('body').attr('class', 'home layout');
+    $('#layout-container').html(self.templateIndex());
+    for (var id in utxos) {
+      var item = self.buildAssetItem(assets[id], utxos[id]);
+      $('.assets.list').append(self.partialBalanceItem(item));
+    }
+  },
+
+  buildAssetItem: function (asset, utxos) {
+    var total = new Decimal(0);
+    for (var id in utxos) {
+      total = total.add(new Decimal(utxos[id].amount));
+    }
+    return Object.assign({
+      total: total.toString(),
+    }, asset);
   },
 
   loadUTXOs: function (offset, conv, filter, callback) {
