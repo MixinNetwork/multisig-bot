@@ -1,4 +1,128 @@
 @import '../constant.scss';
 
 .home.layout {
+  .submitting.overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    top: 0;
+    left: 0;
+  }
+
+  .assets.list {
+    list-style: none;
+    margin: 0 16px;
+    padding: 0;
+    border-bottom: 1px solid #EFEFEF;
+  }
+
+  .assets.list .item {
+    list-style: none;
+    margin: 0;
+    padding: 16px 0;
+    border-top: 1px solid #EFEFEF;
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+
+    .asset.icon {
+      display: inline-block;
+      min-width: 48px;
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      background: #EFEFEF;
+      color: $color-main-highlight;
+      text-align: center;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .asset.info {
+      box-sizing: border-box;
+      padding: 2px 16px 0;
+      min-width: 0;
+      font-family: $font-main-title;
+
+      .name {
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 1em;
+        margin: 2px 0 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .total {
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1em;
+        margin: 8px 0 0;
+      }
+    }
+  }
+
+  .contacts.list {
+    .user.field label {
+      display: flex;
+
+      .user.avatar {
+        display: inline-block;
+        min-width: 48px;
+        width: 48px;
+        height: 48px;
+        border-radius: 24px;
+        background: #EFEFEF;
+        color: $color-main-highlight;
+        text-align: center;
+        overflow: hidden;
+
+        p {
+          line-height: 48px;
+          font-size: 24px;
+          font-weight: 400;
+          padding: 0;
+          margin: 0;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .user.info {
+        box-sizing: border-box;
+        padding: 2px 16px 0;
+        min-width: 0;
+        font-family: $font-main-title;
+
+        h5 {
+          font-size: 18px;
+          font-weight: 300;
+          line-height: 1em;
+          margin: 2px 0 8px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        span {
+          font-size: 14px;
+          font-weight: 300;
+          line-height: 1em;
+          margin: 8px 0 0;
+        }
+      }
+    }
+
+  }
 }

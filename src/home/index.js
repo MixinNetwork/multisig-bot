@@ -105,16 +105,23 @@ Home.prototype = {
               console.log(JSON.stringify(tx));
               var raw = mixinGo.buildTransaction(JSON.stringify(tx));
               console.log(raw);
+              self.createMultisigRequest(raw, function (multi) {
+                console.log(multi);
+              });
             });
           } else {
             console.log(JSON.stringify(tx));
             var raw = mixinGo.buildTransaction(JSON.stringify(tx));
             console.log(raw);
+            self.createMultisigRequest(raw, function (multi) {
+              console.log(multi);
+            });
           }
         });
       });
       $('input[type=submit]').click(function (event) {
         event.preventDefault();
+        $('.submitting.overlay').show();
         $(this).parents('form').submit();
       });
     }
@@ -143,6 +150,15 @@ Home.prototype = {
       alert('INVALID THRESHOLD ' + t);
     }
     return 'fffe' + s;
+  },
+
+  createMultisigRequest(raw, callback) {
+    this.api.request('POST', '/multisigs', {raw: raw}, function (resp) {
+      if (resp.error) {
+        return;
+      }
+      callback(resp.data);
+    });
   },
 
   loadGhostKeys: function(members, index, callback) {
@@ -184,12 +200,33 @@ Home.prototype = {
 
   loadContacts: function (callback) {
     const self = this;
-    self.api.request('GET', '/friends', undefined, function (resp) {
-      if (resp.error) {
-        return false;
-      }
-      callback(resp.data);
-    });
+    const key = 'friends-list';
+    var friends = localStorage.getItem(key);
+    if (friends) {
+      callback(JSON.parse(friends));
+      self.api.request('GET', '/friends', undefined, function (resp) {
+        if (resp.error) {
+          return false;
+        }
+        for (var i in resp.data) {
+          var u = resp.data[i];
+          u.firstLetter = u.avatar_url === '' ? (u.full_name.trim()[0] || '^_^') : undefined;
+        }
+        localStorage.setItem(key, JSON.stringify(resp.data));
+      });
+    } else {
+      self.api.request('GET', '/friends', undefined, function (resp) {
+        if (resp.error) {
+          return false;
+        }
+        for (var i in resp.data) {
+          var u = resp.data[i];
+          u.firstLetter = u.avatar_url === '' ? (u.full_name.trim()[0] || '^_^') : undefined;
+        }
+        localStorage.setItem(key, JSON.stringify(resp.data));
+        callback(resp.data);
+      });
+    }
   },
 
   loadAssets: function (offset, ids, output, callback) {

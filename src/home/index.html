@@ -1,13 +1,11 @@
-<div class="container">
-  <ul class="assets list">
-    {{#each assets}}
-    <li class="wallet asset balance item" id="asset-item-{{asset_id}}" data-id="{{asset_id}}">
-      <img src="{{icon_url}}" width="64" height="64" class="asset icon">
-      <div class="asset info">
-        <h3 class="asset name">{{name}}</h3>
-        <h4 class="asset total">{{total}} {{symbol}}</h4>
-      </div>
-    </li>
-    {{/each}}
-  </ul>
-</div>
+<ul class="assets list">
+  {{#each assets}}
+  <li class="wallet asset balance item" id="asset-item-{{asset_id}}" data-id="{{asset_id}}">
+    <img src="{{icon_url}}" width="64" height="64" class="asset icon">
+    <div class="asset info">
+      <h3 class="asset name">{{name}}</h3>
+      <h4 class="asset total">{{total}} {{symbol}}</h4>
+    </div>
+  </li>
+  {{/each}}
+</ul>
