@@ -1,0 +1,26 @@
+<form action="javascript:void(0);" class="normform">
+  <fieldset>
+    {{#each contacts}}
+    <div class="field">
+      <input type="checkbox" name="checkbox-{{user_id}}" id="checkbox-{{user_id}}">
+      <label for="checkbox-{{user_id}}">
+        <img src="{{avatar_url}}" width="42" height="42">
+        <span>{{full_name}}</span>
+        <span>{{identity_number}}</span>
+      </label>
+    </div>
+    {{/each}}
+    <div class="field">
+      <label for="threshold">Threshold</label>
+      <input type="number" name="threshold" />
+    </div>
+    <div class="field">
+      <label for="amount">{{asset.symbol}}</label>
+      <input type="number" name="amount" />
+    </div>
+    <div class="field">
+      <input type="submit" value="Send {{asset.symbol}}" />
+    </div>
+    <input type="hidden" value="{{asset.asset_id}}" name="asset_id" />
+  </fieldset>
+</form>

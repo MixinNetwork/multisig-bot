@@ -5,9 +5,10 @@ import Mixin from '../utils/mixin';
 
 function Home(router, api) {
   this.router = router;
-  this.templateIndex = require('./index.html');
+  this.partialLoading = require('../loading.html');
   this.templateGuide = require('./guide.html');
-  this.partialBalanceItem = require('./balance.html');
+  this.templateIndex = require('./index.html');
+  this.templateSend = require('./send.html');
   this.api = api;
 }
 
@@ -26,7 +27,7 @@ Home.prototype = {
               return;
             }
             self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
-              self.renderWallet(users, assets, utxos);
+              self.renderWalletForAll(users, assets, utxos);
             });
           });
         });
@@ -36,28 +37,47 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
-  renderWallet: function (users, assets, utxos) {
+  renderWalletForAll: function (users, assets, utxos) {
     const self = this;
-    $('body').attr('class', 'home layout');
-    $('#layout-container').html(self.templateIndex());
+    var assetsView = [];
     for (var id in utxos) {
       var item = self.buildAssetItem(assets[id], utxos[id]);
-      $('.assets.list').append(self.partialBalanceItem(item));
-      $('#asset-item-' + id).on('click', function (e) {
-        e.preventDefault();
-        alert($(this).attr('id'));
+      assetsView.push(item);
+    }
+    $('body').attr('class', 'home layout');
+    $('#layout-container').html(self.templateIndex({assets: assetsView}));
+    $('.assets.list .wallet.item').on('click', function (e) {
+      e.preventDefault();
+      var id = $(this).attr('data-id');
+      $('body').attr('class', 'loading layout');
+      $('#layout-container').html(self.partialLoading());
+      self.loadContacts(function (contacts) {
+        self.renderWalletForAsset(assets[id], utxos[id], contacts);
       });
+    });
+  },
+
+  renderWalletForAsset: function (asset, utxos, contacts) {
+    const self = this;
+    $('body').attr('class', 'home layout');
+    if (Decimal.sign(asset.signed) > 0) {
+    } else {
+      $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
     }
   },
 
   buildAssetItem: function (asset, utxos) {
-    var total = new Decimal(0);
+    var total = new Decimal(0), signed = new Decimal(0), pending = new Decimal(0);
     for (var id in utxos) {
       total = total.add(new Decimal(utxos[id].amount));
+      if (utxos[id].state === 'signed') {
+        signed = signed.add(new Decimal(utxos[id].signed));
+      }
     }
-    return Object.assign({
-      total: total.toString(),
-    }, asset);
+    asset.total = total.toString();
+    asset.signed = signed.toString();
+    asset.pending = pending.toString();
+    return asset;
   },
 
   loadUTXOs: function (offset, conv, filter, callback) {
@@ -90,7 +110,7 @@ Home.prototype = {
 
   loadContacts: function (callback) {
     const self = this;
-    self.api.request('GET', '/contacts', undefined, function (resp) {
+    self.api.request('GET', '/friends', undefined, function (resp) {
       if (resp.error) {
         return false;
       }
@@ -138,16 +158,7 @@ Home.prototype = {
 
   loadConversation: function (callback, id) {
     const self = this;
-    const key = 'conversation-' + id;
-    var conv = localStorage.getItem(key);
-    if (conv) {
-      return callback({data:JSON.parse(conv)});
-    }
     self.api.account.conversation(function(resp) {
-      if (resp.error) {
-        return callback(resp);
-      }
-      localStorage.setItem(key, JSON.stringify(resp.data));
       return callback(resp);
     }, id);
   },
