@@ -62,7 +62,6 @@ Home.prototype = {
 
   renderWalletForAsset: function (asset, utxos, contacts) {
     const self = this;
-    $('body').attr('class', 'home layout');
     if (Decimal.sign(asset.signed) > 0) {
       var utxo = undefined;
       for (var i in utxos) {
@@ -99,6 +98,7 @@ Home.prototype = {
           multi.signers = signers;
           multi.asset = asset;
           console.log(multi);
+          $('body').attr('class', 'home layout');
           $('#layout-container').html(self.templateSign(multi));
           $('textarea').each(function() {
             $(this).height($(this).prop('scrollHeight'));
@@ -116,6 +116,7 @@ Home.prototype = {
         });
       });
     } else {
+      $('body').attr('class', 'home layout');
       $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
       $('form').submit(function (event) {
         event.preventDefault();
