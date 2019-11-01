@@ -10,6 +10,7 @@ function Home(router, api) {
   this.templateGuide = require('./guide.html');
   this.templateIndex = require('./index.html');
   this.templateSend = require('./send.html');
+  this.templateState = require('./state.html');
   this.api = api;
 }
 
@@ -105,17 +106,13 @@ Home.prototype = {
               console.log(JSON.stringify(tx));
               var raw = mixinGo.buildTransaction(JSON.stringify(tx));
               console.log(raw);
-              self.createMultisigRequest(raw, function (multi) {
-                console.log(multi);
-              });
+              self.handleMultisigRequest(raw, 'sign');
             });
           } else {
             console.log(JSON.stringify(tx));
             var raw = mixinGo.buildTransaction(JSON.stringify(tx));
             console.log(raw);
-            self.createMultisigRequest(raw, function (multi) {
-              console.log(multi);
-            });
+            self.handleMultisigRequest(raw, 'sign');
           }
         });
       });
@@ -125,6 +122,28 @@ Home.prototype = {
         $(this).parents('form').submit();
       });
     }
+  },
+
+  handleMultisigRequest: function(raw, action) {
+    const self = this;
+    self.createMultisigRequest(raw, action, function (multi) {
+      console.log(multi);
+      setTimeout(function() { self.waitForAction(multi.code_id); }, 1500);
+      window.location.replace('mixin://codes/' + multi.code_id);
+    });
+  },
+
+  waitForAction: function (codeId) {
+    const self = this;
+    self.api.request('GET', '/codes/' + codeId, undefined, function(resp) {
+      if (resp.error && resp.error.code === 404) {
+        $('#layout-container').html(self.templateState({status: 'close'}));
+      } else if (resp.data && resp.data.state !== 'initial') {
+        $('#layout-container').html(self.templateState({status: 'check'}));
+      } else {
+        setTimeout(function() { self.waitForAction(codeId); }, 1500);
+      }
+    });
   },
 
   buildAssetItem: function (asset, utxos) {
@@ -152,8 +171,8 @@ Home.prototype = {
     return 'fffe' + s;
   },
 
-  createMultisigRequest(raw, callback) {
-    this.api.request('POST', '/multisigs', {raw: raw}, function (resp) {
+  createMultisigRequest(raw, action, callback) {
+    this.api.request('POST', '/multisigs', {raw: raw, action: action}, function (resp) {
       if (resp.error) {
         return;
       }

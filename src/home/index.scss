@@ -12,6 +12,23 @@
     left: 0;
   }
 
+  .paid.status {
+    box-sizing: border-box;
+    padding: 64px 0;
+    text-align: center;
+
+    i {
+      color: $color-main-highlight;
+      font-size: 64px;
+      display: inline-block;
+      margin: 64px auto;
+
+      &.icon-close {
+        color: #FF0000;
+      }
+    }
+  }
+
   .assets.list {
     list-style: none;
     margin: 0 16px;
