@@ -119,14 +119,14 @@ Home.prototype = {
   },
 
   loadUsers: function (ps, callback) {
-    const key = this.makeUnique(ps);
-    var users = localStorage.getItem(key);
-    if (users) {
-      return callback(JSON.parse(users));
-    }
     var ids = [];
     for (var i in ps) {
       ids.push(ps[i].user_id);
+    }
+    var key = ids.sort().join('');
+    var users = localStorage.getItem(key);
+    if (users) {
+      return callback(JSON.parse(users));
     }
     this.api.request('POST', '/users/fetch', ids, function(resp) {
       if (resp.data) {
@@ -164,6 +164,10 @@ Home.prototype = {
   makeUnique: function (ps) {
     var ids = [];
     for (var i in ps) {
+      var id = ps[i].user_id;
+      if (id === CLIENT_ID) {
+        continue;
+      }
       ids.push(ps[i].user_id)
     }
     return ids.sort().join('');
