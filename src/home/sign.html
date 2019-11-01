@@ -1,0 +1,56 @@
+<form action="javascript:void(0);" class="normform sign form">
+  <legend>Transaction</legend>
+  <fieldset>
+    <div class="field">
+      <label for="hash">Transaction Hash</label>
+      <input type="text" name="hash" value="{{transaction_hash}}" disabled />
+    </div>
+    <div class="field">
+      <label for="raw">Raw Transaction</label>
+      <textarea name="raw" disabled>{{raw_transaction}}</textarea>
+    </div>
+    <div class="field">
+      <label for="amount">Amount ({{asset.symbol}})</label>
+      <input type="number" name="amount" value="{{amount}}" disabled/>
+    </div>
+    <div class="field receivers">
+      <label>Receivers</label>
+      {{#each receivers}}
+      <div class="user avatar">
+        {{#if firstLetter}}
+        <p>{{firstLetter}}</p>
+        {{else}}
+        <img src="{{avatar_url}}" />
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+    <div class="field singers">
+      <label>Signers</label>
+      {{#each signers}}
+      <div class="user avatar">
+        {{#if firstLetter}}
+        <p>{{firstLetter}}</p>
+        {{else}}
+        <img src="{{avatar_url}}" />
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+    <div class="field">
+      <input type="submit" value="Sign The Transaction" />
+    </div>
+  </fieldset>
+</form>
+
+<div class="submitting overlay">
+  <div class="spinner-container">
+    <div class="spinner">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+  </div>
+</div>

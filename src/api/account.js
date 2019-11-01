@@ -8,20 +8,28 @@ function Account(api) {
 
 Account.prototype = {
   authenticate: function (callback, authorizationCode) {
+    const self = this;
     var params = {
       "client_id": CLIENT_ID,
       "code": authorizationCode,
       "code_verifier": window.localStorage.getItem("verifier")
     };
     this.api.request('POST', '/oauth/token', params, function(resp) {
-      if (resp.data) {
-        if (resp.data.scope.indexOf('ASSETS:READ') < 0 || resp.data.scope.indexOf('CONTACTS:READ') < 0) {
-          resp.error = { code: 403, description: 'Access denied.' };
+      if (resp.error) {
+        return callback(resp);
+      }
+      if (resp.data.scope.indexOf('ASSETS:READ') < 0 || resp.data.scope.indexOf('CONTACTS:READ') < 0) {
+        resp.error = { code: 403, description: 'Access denied.' };
+        return callback(resp);
+      }
+      self.api.requestWithToken('GET', '/me', undefined, resp.data.access_token, function (me) {
+        if (me.error) {
           return callback(resp);
         }
+        window.localStorage.setItem('me', JSON.stringify(me.data));
         window.localStorage.setItem('token', resp.data.access_token);
-      }
-      return callback(resp);
+        return callback(resp);
+      });
     });
   },
 
@@ -45,6 +53,10 @@ Account.prototype = {
       return '';
     }
     return str;
+  },
+
+  me: function () {
+    return JSON.parse(localStorage.getItem('me'));
   },
 
   clear: function (callback) {

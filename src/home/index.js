@@ -10,6 +10,7 @@ function Home(router, api) {
   this.templateGuide = require('./guide.html');
   this.templateIndex = require('./index.html');
   this.templateSend = require('./send.html');
+  this.templateSign = require('./sign.html');
   this.templateState = require('./state.html');
   this.api = api;
 }
@@ -71,7 +72,48 @@ Home.prototype = {
         }
       }
       self.createMultisigRequest(utxo.signed_tx, 'sign', function (multi) {
-        console.log(multi);
+        var participants = [];
+        for (var i in multi.senders) {
+          participants.push({user_id: multi.senders[i]});
+        }
+        for (var i in multi.receivers) {
+          participants.push({user_id: multi.receivers[i]});
+        }
+        self.loadUsers(participants, function (users) {
+          var senders = [], receivers = [], signers = [];
+          for (var i in users) {
+            var u = users[i];
+            u.firstLetter = u.avatar_url === '' ? (u.full_name.trim()[0] || '^_^') : undefined;
+          }
+          for (var i in multi.senders) {
+            senders.push(users[multi.senders[i]]);
+          }
+          for (var i in multi.receivers) {
+            receivers.push(users[multi.receivers[i]]);
+          }
+          for (var i in multi.signers) {
+            signers.push(users[multi.signers[i]]);
+          }
+          multi.senders = senders;
+          multi.receivers = receivers;
+          multi.signers = signers;
+          multi.asset = asset;
+          console.log(multi);
+          $('#layout-container').html(self.templateSign(multi));
+          $('textarea').each(function() {
+            $(this).height($(this).prop('scrollHeight'));
+          });
+          $('form').submit(function (event) {
+            event.preventDefault();
+            setTimeout(function() { self.waitForAction(multi.code_id); }, 1500);
+            window.location.replace('mixin://codes/' + multi.code_id);
+          });
+          $('input[type=submit]').click(function (event) {
+            event.preventDefault();
+            $('.submitting.overlay').show();
+            $(this).parents('form').submit();
+          });
+        });
       });
     } else {
       $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
@@ -289,10 +331,16 @@ Home.prototype = {
       return callback(JSON.parse(users));
     }
     this.api.request('POST', '/users/fetch', ids, function(resp) {
-      if (resp.data) {
-        localStorage.setItem(key, JSON.stringify(resp.data));
-        return callback(resp.data);
+      if (resp.error) {
+        return false;
       }
+      var users = {};
+      for (var i in resp.data) {
+        var u = resp.data[i];
+        users[u.user_id] = u;
+      }
+      localStorage.setItem(key, JSON.stringify(users));
+      return callback(users);
     });
   },
 
