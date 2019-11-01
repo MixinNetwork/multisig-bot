@@ -63,6 +63,16 @@ Home.prototype = {
     const self = this;
     $('body').attr('class', 'home layout');
     if (Decimal.sign(asset.signed) > 0) {
+      var utxo = undefined;
+      for (var i in utxos) {
+        if (utxos[i].signed_tx.length > 0) {
+          utxo = utxos[i];
+          break;
+        }
+      }
+      self.createMultisigRequest(utxo.signed_tx, 'sign', function (multi) {
+        console.log(multi);
+      });
     } else {
       $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
       $('form').submit(function (event) {
@@ -151,7 +161,7 @@ Home.prototype = {
     for (var id in utxos) {
       total = total.add(new Decimal(utxos[id].amount));
       if (utxos[id].state === 'signed') {
-        signed = signed.add(new Decimal(utxos[id].signed));
+        signed = signed.add(new Decimal(utxos[id].amount));
       }
     }
     asset.total = total.toString();
@@ -171,7 +181,7 @@ Home.prototype = {
     return 'fffe' + s;
   },
 
-  createMultisigRequest(raw, action, callback) {
+  createMultisigRequest: function(raw, action, callback) {
     this.api.request('POST', '/multisigs', {raw: raw, action: action}, function (resp) {
       if (resp.error) {
         return;
