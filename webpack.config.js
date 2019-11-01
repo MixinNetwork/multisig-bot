@@ -11,7 +11,7 @@ const extractSass = new ExtractTextPlugin({
 
 const webRoot = function (env) {
   if (env === 'production') {
-    return 'https://multisig.mixin.zone';
+    return 'https://multisig.vec.io';
   } else {
     return 'http://multisig.local';
   }
@@ -27,9 +27,9 @@ const apiRoot = function (env) {
 
 const clientId = function (env) {
   if (env === 'production') {
-    return 'fbd26bc6-3d04-4964-a7fe-a540432b16e2';
+    return '37e040ec-df91-47a7-982e-0e118932fa8b';
   } else {
-    return 'b4565f3b-94ef-4898-bfd9-f4fc627c1e99';
+    return '37e040ec-df91-47a7-982e-0e118932fa8b';
   }
 };
 
