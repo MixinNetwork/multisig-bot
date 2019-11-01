@@ -15,7 +15,7 @@ Home.prototype = {
   index: function () {
     const self = this;
     self.loadConversation(function(resp) {
-      if (resp.error && resp.error.code === 404 || resp.data && resp.data.category !== 'GROUP') {
+      if (resp.error && resp.error.code === 404 || resp.data && resp.data.category !== 'GROUP' || resp.data && self.parseThreshold(resp.data.name) < 1) {
         $('body').attr('class', 'home layout');
         $('#layout-container').html(self.templateGuide());
         return true;
@@ -43,6 +43,10 @@ Home.prototype = {
     for (var id in utxos) {
       var item = self.buildAssetItem(assets[id], utxos[id]);
       $('.assets.list').append(self.partialBalanceItem(item));
+      $('#asset-item-' + id).on('click', function (e) {
+        e.preventDefault();
+        alert($(this).attr('id'));
+      });
     }
   },
 
@@ -82,6 +86,16 @@ Home.prototype = {
       }
       self.loadUTXOs(resp.data[resp.data.length-1].created_at, conv.participants, filter, callback);
     }, offset, 100);
+  },
+
+  loadContacts: function (callback) {
+    const self = this;
+    self.api.request('GET', '/contacts', undefined, function (resp) {
+      if (resp.error) {
+        return false;
+      }
+      callback(resp.data);
+    });
   },
 
   loadAssets: function (offset, ids, output, callback) {
@@ -143,7 +157,8 @@ Home.prototype = {
     if (parts.length != 2) {
       return -1;
     }
-    return parseInt(parts[1]);
+    var t = parseInt(parts[1]);
+    return t ? t : -1;
   },
 
   makeUnique: function (ps) {

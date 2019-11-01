@@ -15,7 +15,7 @@ Account.prototype = {
     };
     this.api.request('POST', '/oauth/token', params, function(resp) {
       if (resp.data) {
-        if (resp.data.scope.indexOf('ASSETS:READ') < 0) {
+        if (resp.data.scope.indexOf('ASSETS:READ') < 0 || resp.data.scope.indexOf('CONTACTS:READ') < 0) {
           resp.error = { code: 403, description: 'Access denied.' };
           return callback(resp);
         }

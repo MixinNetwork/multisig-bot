@@ -55,7 +55,7 @@ API.prototype = {
       switch (resp.error.code) {
         case 401:
           this.account.clear();
-          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+ASSETS:READ&response_type=code&code_challenge='+this.account.challenge());
+          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+ASSETS:READ+CONTACTS:READ&response_type=code&code_challenge='+this.account.challenge());
           break;
         case 404:
           $('#layout-container').html(this.Error404());
