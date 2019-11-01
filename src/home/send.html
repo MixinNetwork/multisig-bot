@@ -2,7 +2,7 @@
   <fieldset>
     {{#each contacts}}
     <div class="field">
-      <input type="checkbox" name="checkbox-{{user_id}}" id="checkbox-{{user_id}}">
+      <input type="checkbox" name="checkbox-{{user_id}}" id="checkbox-{{user_id}}" value="{{user_id}}">
       <label for="checkbox-{{user_id}}">
         <img src="{{avatar_url}}" width="42" height="42">
         <span>{{full_name}}</span>

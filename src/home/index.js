@@ -1,7 +1,8 @@
 import './index.scss';
 import $ from 'jquery';
 import Decimal from 'decimal.js';
-import Mixin from '../utils/mixin';
+import Mixin from '../utils/mixin.js';
+require('../utils/transaction.js');
 
 function Home(router, api) {
   this.router = router;
@@ -63,6 +64,59 @@ Home.prototype = {
     if (Decimal.sign(asset.signed) > 0) {
     } else {
       $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
+      $('form').submit(function (event) {
+        event.preventDefault();
+        var members = [];
+        $('input:checkbox:checked').each(function () {
+          members.push($(this).val());
+        });
+        var tx = {
+          version: 1,
+          asset: asset.mixin_id,
+          inputs: [],
+          outputs: []
+        };
+        var inputAmount = new Decimal(0), amount = new Decimal($('input[name="amount"]').val());
+        for (var i in utxos) {
+          var utxo = utxos[i];
+          inputAmount = inputAmount.add(new Decimal(utxo.amount));
+          tx.inputs.push({
+            hash: utxo.transaction_hash,
+            index: utxo.output_index
+          });
+          if (inputAmount.cmp(amount) >= 0) {
+            break;
+          }
+        }
+        if (inputAmount.cmp(amount) < 0) {
+          alert('TOO MUCH');
+          return;
+        }
+        self.loadGhostKeys(members, 0, function (output) {
+          output.amount = amount.toString();
+          output.script = self.buildThresholdScript(parseInt($('input[name="threshold"]').val()));
+          tx.outputs.push(output)
+          if (inputAmount.cmp(amount) > 0) {
+            var utxo = utxos[Object.keys(utxos)[0]];
+            self.loadGhostKeys(utxo.members, 1, function(output) {
+              output.amount = inputAmount.sub(amount).toString();
+              output.script = self.buildThresholdScript(utxo.threshold);
+              tx.outputs.push(output)
+              console.log(JSON.stringify(tx));
+              var raw = mixinGo.buildTransaction(JSON.stringify(tx));
+              console.log(raw);
+            });
+          } else {
+            console.log(JSON.stringify(tx));
+            var raw = mixinGo.buildTransaction(JSON.stringify(tx));
+            console.log(raw);
+          }
+        });
+      });
+      $('input[type=submit]').click(function (event) {
+        event.preventDefault();
+        $(this).parents('form').submit();
+      });
     }
   },
 
@@ -78,6 +132,26 @@ Home.prototype = {
     asset.signed = signed.toString();
     asset.pending = pending.toString();
     return asset;
+  },
+
+  buildThresholdScript: function (t) {
+    var s = t.toString(16);
+    if (s.length === 1) {
+      s = '0' + s;
+    }
+    if (s.length > 2) {
+      alert('INVALID THRESHOLD ' + t);
+    }
+    return 'fffe' + s;
+  },
+
+  loadGhostKeys: function(members, index, callback) {
+    this.api.request('POST', '/outputs', {receivers: members, index: index}, function (resp) {
+      if (resp.error) {
+        return;
+      }
+      callback(resp.data);
+    });
   },
 
   loadUTXOs: function (offset, conv, filter, callback) {
