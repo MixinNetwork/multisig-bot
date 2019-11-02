@@ -97,6 +97,7 @@ Home.prototype = {
           multi.receivers = receivers;
           multi.signers = signers;
           multi.asset = asset;
+          multi.finished = signers.length >= utxo.threshold;
           console.log(multi);
           $('body').attr('class', 'home layout');
           $('#layout-container').html(self.templateSign(multi));
@@ -105,8 +106,20 @@ Home.prototype = {
           });
           $('form').submit(function (event) {
             event.preventDefault();
-            setTimeout(function() { self.waitForAction(multi.code_id); }, 1500);
-            window.location.replace('mixin://codes/' + multi.code_id);
+            if (multi.signers.length < utxo.threshold) {
+              setTimeout(function() { self.waitForAction(multi.code_id); }, 1500);
+              window.location.replace('mixin://codes/' + multi.code_id);
+              return;
+            }
+            var params = {method: "sendrawtransaction", params: [multi.raw_transaction]};
+            self.api.request('POST', '/external/proxy', params, function (resp) {
+              if (resp.data && resp.data.hash === multi.transaction_hash) {
+                $('#layout-container').html(self.templateState({status: 'check'}));
+              } else {
+                $('#layout-container').html(self.templateState({status: 'close'}));
+              }
+              return true;
+            });
           });
           $('input[type=submit]').click(function (event) {
             event.preventDefault();
@@ -116,6 +129,7 @@ Home.prototype = {
         });
       });
     } else {
+      contacts.push(self.api.account.me());
       $('body').attr('class', 'home layout');
       $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
       $('form').submit(function (event) {

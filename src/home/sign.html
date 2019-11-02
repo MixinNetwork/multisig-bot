@@ -38,7 +38,11 @@
       {{/each}}
     </div>
     <div class="field">
+      {{#if finished}}
+      <input type="submit" value="Submit The Transaction" />
+      {{else}}
       <input type="submit" value="Sign The Transaction" />
+      {{/if}}
     </div>
   </fieldset>
 </form>
