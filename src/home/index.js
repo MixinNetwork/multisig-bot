@@ -12,6 +12,7 @@ function Home(router, api) {
   this.templateSend = require('./send.html');
   this.templateSign = require('./sign.html');
   this.templateState = require('./state.html');
+  this.templateEmpty = require('./empty.html');
   this.api = api;
 }
 
@@ -27,11 +28,13 @@ Home.prototype = {
         self.loadUsers(resp.data.participants, function (users) {
           self.loadUTXOs(undefined, resp.data, {}, function (utxos) {
             if (Object.keys(utxos).length == 0) {
-              return;
+              $('body').attr('class', 'home layout');
+              $('#layout-container').html(self.templateEmpty());
+            } else {
+              self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
+                self.renderWalletForAll(users, assets, utxos);
+              });
             }
-            self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
-              self.renderWalletForAll(users, assets, utxos);
-            });
           });
         });
         return true;
