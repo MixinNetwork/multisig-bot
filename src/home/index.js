@@ -20,7 +20,10 @@ Home.prototype = {
   index: function () {
     const self = this;
     self.loadConversation(function(resp) {
-      if (resp.error && resp.error.code === 404 || resp.data && resp.data.category !== 'GROUP' || resp.data && self.parseThreshold(resp.data.name) < 1) {
+      if (resp.error && resp.error.code === 404
+        || resp.data && resp.data.category !== 'GROUP'
+        || resp.data && self.parseThreshold(resp.data.name) < 1
+        || resp.data && resp.data.participants.length < 3) {
         $('body').attr('class', 'home layout');
         $('#layout-container').html(self.templateGuide());
         return true;
