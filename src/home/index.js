@@ -146,7 +146,7 @@ Home.prototype = {
           asset: asset.mixin_id,
           inputs: [],
           outputs: [],
-          extra: toHex($('input[name="memo"]').val()),
+          extra: self.toHex($('input[name="memo"]').val()),
         };
         var inputAmount = new Decimal(0), amount = new Decimal($('input[name="amount"]').val());
         for (var i in utxos) {
