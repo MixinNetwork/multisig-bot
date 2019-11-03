@@ -23,8 +23,12 @@
       <input type="number" name="threshold" />
     </div>
     <div class="field">
-      <label for="amount">{{asset.symbol}}</label>
+      <label for="amount">Amount ({{asset.symbol}})</label>
       <input type="number" step="0.00000001" name="amount" />
+    </div>
+    <div class="field">
+      <label for="memo">Memo</label>
+      <input type="text" name="memo" />
     </div>
     <div class="field">
       <input type="submit" value="Send {{asset.symbol}}" />

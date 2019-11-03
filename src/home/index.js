@@ -145,7 +145,8 @@ Home.prototype = {
           version: 1,
           asset: asset.mixin_id,
           inputs: [],
-          outputs: []
+          outputs: [],
+          extra: toHex($('input[name="memo"]').val()),
         };
         var inputAmount = new Decimal(0), amount = new Decimal($('input[name="amount"]').val());
         for (var i in utxos) {
@@ -388,6 +389,18 @@ Home.prototype = {
       ids.push(ps[i].user_id)
     }
     return ids.sort().join('');
+  },
+
+  toHex: function(s) {
+    if (typeof(s) !== 'string') {
+      return '';
+    }
+    var s = unescape(encodeURIComponent(s))
+    var h = ''
+    for (var i = 0; i < s.length; i++) {
+      h += s.charCodeAt(i).toString(16)
+    }
+    return h
   },
 };
 
