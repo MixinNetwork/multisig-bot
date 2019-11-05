@@ -44,7 +44,7 @@ func buildTransaction(data string) string {
 	tx := common.NewTransaction(raw.Asset)
 	for _, in := range raw.Inputs {
 		if in.Deposit != nil {
-			tx.AddDepositInput(in.Deposit)
+			return "invalid input with deposit"
 		} else {
 			tx.AddInput(in.Hash, in.Index)
 		}
