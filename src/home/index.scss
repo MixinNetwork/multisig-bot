@@ -12,6 +12,17 @@
     left: 0;
   }
 
+  .bottom.button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    input {
+      border-radius: 0;
+    }
+  }
+
   .paid.status {
     box-sizing: border-box;
     padding: 64px 0;

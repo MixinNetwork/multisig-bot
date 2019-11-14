@@ -1,5 +1,6 @@
 import './index.scss';
 import $ from 'jquery';
+import uuidv4 from 'uuid/v4';
 import Decimal from 'decimal.js';
 import Mixin from '../utils/mixin.js';
 require('../utils/transaction.js');
@@ -13,6 +14,7 @@ function Home(router, api) {
   this.templateSign = require('./sign.html');
   this.templateState = require('./state.html');
   this.templateEmpty = require('./empty.html');
+  this.templateReceive = require('./receive.html');
   this.api = api;
 }
 
@@ -33,6 +35,7 @@ Home.prototype = {
             if (Object.keys(utxos).length == 0) {
               $('body').attr('class', 'home layout');
               $('#layout-container').html(self.templateEmpty());
+              $('.bottom.button input:submit').click(function () {self.renderReceive();});
             } else {
               self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
                 self.renderWalletForAll(users, assets, utxos);
@@ -46,6 +49,23 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
+  renderReceive: function () {
+    const self = this;
+    $('#layout-container').html(self.templateReceive({
+      assets: [{
+        asset_id: 'c94ac88f-4671-3976-b60a-09064f1811e8',
+        symbol: 'XIN'
+      },{
+        asset_id: '43d61dcd-e413-450d-80b8-101d5e903357',
+        symbol: 'ETH'
+      },{
+        asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
+        symbol: 'CNB'
+      }],
+      trace_id: uuidv4().toUpperCase()
+    }));
+  },
+
   renderWalletForAll: function (users, assets, utxos) {
     const self = this;
     var assetsView = [];
@@ -55,6 +75,7 @@ Home.prototype = {
     }
     $('body').attr('class', 'home layout');
     $('#layout-container').html(self.templateIndex({assets: assetsView}));
+    $('.bottom.button input:submit').click(function () {self.renderReceive();});
     $('.assets.list .wallet.item').on('click', function (e) {
       e.preventDefault();
       var id = $(this).attr('data-id');
