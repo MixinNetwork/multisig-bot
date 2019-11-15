@@ -3,6 +3,7 @@ import $ from 'jquery';
 import uuidv4 from 'uuid/v4';
 import Decimal from 'decimal.js';
 import Mixin from '../utils/mixin.js';
+import FormUtils from '../utils/form.js';
 require('../utils/transaction.js');
 
 function Home(router, api) {
@@ -35,10 +36,10 @@ Home.prototype = {
             if (Object.keys(utxos).length == 0) {
               $('body').attr('class', 'home layout');
               $('#layout-container').html(self.templateEmpty());
-              $('.bottom.button input:submit').click(function () {self.renderReceive();});
+              $('.bottom.button input:submit').click(function () {self.renderReceive(resp.data);});
             } else {
               self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
-                self.renderWalletForAll(users, assets, utxos);
+                self.renderWalletForAll(resp.data, users, assets, utxos);
               });
             }
           });
@@ -49,7 +50,7 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
-  renderReceive: function () {
+  renderReceive: function (conv) {
     const self = this;
     $('#layout-container').html(self.templateReceive({
       assets: [{
@@ -62,11 +63,37 @@ Home.prototype = {
         asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
         symbol: 'CNB'
       }],
-      trace_id: uuidv4().toUpperCase()
+      trace_id: uuidv4()
     }));
+    $('form').submit(function (event) {
+      event.preventDefault();
+      var params = new FormUtils().serialize($(this));
+      params.opponent_multisig = { receivers: [], threshold: self.parseThreshold(conv.name) };
+      for (var i in conv.participants) {
+        var id = conv.participants[i].user_id;
+        if (id === CLIENT_ID) {
+          continue;
+        }
+        params.opponent_multisig.receivers.push(id);
+      }
+      console.log(params);
+      self.api.request('POST', '/payments', params, function (resp) {
+        if (resp.error) {
+          return;
+        }
+        console.log(resp.data);
+        var text = `https://mixin.one/codes/${resp.data.code_id}`;
+        window.location = `mixin://send?text=${encodeURIComponent(text)}`;
+      });
+    });
+    $('input[type=submit]').click(function (event) {
+      event.preventDefault();
+      $('.submitting.overlay').show();
+      $(this).parents('form').submit();
+    });
   },
 
-  renderWalletForAll: function (users, assets, utxos) {
+  renderWalletForAll: function (conv, users, assets, utxos) {
     const self = this;
     var assetsView = [];
     for (var id in utxos) {
@@ -75,7 +102,7 @@ Home.prototype = {
     }
     $('body').attr('class', 'home layout');
     $('#layout-container').html(self.templateIndex({assets: assetsView}));
-    $('.bottom.button input:submit').click(function () {self.renderReceive();});
+    $('.bottom.button input:submit').click(function () {self.renderReceive(conv);});
     $('.assets.list .wallet.item').on('click', function (e) {
       e.preventDefault();
       var id = $(this).attr('data-id');
