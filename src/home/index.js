@@ -189,7 +189,7 @@ Home.prototype = {
       $('form').submit(function (event) {
         event.preventDefault();
         var members = [];
-        $('input:checkbox:checked').each(function () {
+        $('input:radio:checked').each(function () {
           members.push($(this).val());
         });
         var tx = {
