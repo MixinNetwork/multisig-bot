@@ -60,6 +60,24 @@ Home.prototype = {
         asset_id: '43d61dcd-e413-450d-80b8-101d5e903357',
         symbol: 'ETH'
       },{
+        asset_id: 'c6d0c728-2624-429b-8e0d-d9d19b6592fa',
+        symbol: 'BTC'
+      },{
+        asset_id: '4d8c508b-91c5-375b-92b0-ee702ed2dac5',
+        symbol: 'USDT-ERC20'
+      },{
+        asset_id: '815b0b1a-2764-3736-8faa-42d694fa620a',
+        symbol: 'USDT-Omni'
+      },{
+        asset_id: 'f5ef6b5d-cc5a-3d90-b2c0-a2fd386e7a3c',
+        symbol: 'BOX'
+      },{
+        asset_id: '3edb734c-6d6f-32ff-ab03-4eb43640c758',
+        symbol: 'PRS'
+      },{
+        asset_id: '2566bf58-c4de-3479-8c55-c137bb7fe2ae',
+        symbol: 'ONE'
+      },{
         asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
         symbol: 'CNB'
       }],
