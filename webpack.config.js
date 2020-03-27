@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
-const WebappWebpackPlugin = require('webapp-webpack-plugin');
+const WebappWebpackPlugin = require('favicons-webpack-plugin');
 
 const extractSass = new ExtractTextPlugin({
     filename: "[name]-[hash].css"
@@ -104,8 +104,7 @@ module.exports = {
     }),
     new WebappWebpackPlugin({
       logo: './src/launcher.png',
-      prefix: 'icons-[hash]-',
-      background: '#FFFFFF'
+      prefix: 'icons-[hash]-'
     }),
     new ScriptExtHtmlWebpackPlugin({
       defaultAttribute: 'async'
