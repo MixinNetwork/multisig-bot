@@ -78,6 +78,18 @@ Home.prototype = {
         asset_id: '2566bf58-c4de-3479-8c55-c137bb7fe2ae',
         symbol: 'ONE'
       },{
+        asset_id: '9b180ab6-6abe-3dc0-a13f-04169eb34bfa',
+        symbol: 'USDC'
+      },{
+        asset_id: 'f6f1c01c-8489-3346-b127-dc0dc09b9ce7',
+        symbol: 'LINK'
+      },{
+        asset_id: 'a31e847e-ca87-3162-b4d1-322bc552e831',
+        symbol: 'UNI'
+      },{
+        asset_id: '6eece248-09db-3417-8f70-767896cf5217',
+        symbol: 'WGT'
+      },{
         asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
         symbol: 'CNB'
       }],
