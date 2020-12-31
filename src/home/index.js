@@ -92,6 +92,30 @@ Home.prototype = {
       },{
         asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
         symbol: 'CNB'
+      }, {
+        asset_id: '6cfe566e-4aad-470b-8c9a-2fd35b49c68d',
+        symbol: 'EOS'
+      }, {
+        asset_id: '336d5d97-329c-330d-8e62-2b7c9ba40ea0',
+        symbol: 'IQ'
+      }, {
+        asset_id: 'f1d987df-1835-3f03-aefd-5e3e4132d11e',
+        symbol: 'HT'
+      }, {
+        asset_id: '4e7068df-a483-38af-8b16-cd83ce711184',
+        symbol: 'KEY'
+      }, {
+        asset_id: '44adc71b-0c37-3b42-aa19-fe2d59dae5fd',
+        symbol: 'EPC'
+      }, {
+        asset_id: '88b29aef-6059-3351-abbd-0ecfcc574280',
+        symbol: 'GRT'
+      }, {
+        asset_id: 'ceeaa170-b2fe-3bc1-91a5-5ffa468a1f33',
+        symbol: 'LEO'
+      }, {
+        asset_id: '31d2ea9c-95eb-3355-b65b-ba096853bc18',
+        symbol: 'pUSD'
       }],
       trace_id: uuidv4()
     }));
@@ -337,7 +361,11 @@ Home.prototype = {
       if (resp.error) {
         return;
       }
-      callback(resp.data);
+      var keys = {
+        mask: resp.data.mask,
+        keys: resp.data.keys
+      };
+      callback(keys);
     });
   },
 
