@@ -54,14 +54,17 @@ Home.prototype = {
     const self = this;
     $('#layout-container').html(self.templateReceive({
       assets: [{
-        asset_id: 'c94ac88f-4671-3976-b60a-09064f1811e8',
-        symbol: 'XIN'
+        asset_id: 'c6d0c728-2624-429b-8e0d-d9d19b6592fa',
+        symbol: 'BTC'
       },{
         asset_id: '43d61dcd-e413-450d-80b8-101d5e903357',
         symbol: 'ETH'
       },{
-        asset_id: 'c6d0c728-2624-429b-8e0d-d9d19b6592fa',
-        symbol: 'BTC'
+        asset_id: 'eea900a8-b327-488c-8d8d-1428702fe240',
+        symbol: 'MOB'
+      },{
+        asset_id: 'c94ac88f-4671-3976-b60a-09064f1811e8',
+        symbol: 'XIN'
       },{
         asset_id: '4d8c508b-91c5-375b-92b0-ee702ed2dac5',
         symbol: 'USDT-ERC20'
