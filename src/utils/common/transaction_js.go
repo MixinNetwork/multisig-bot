@@ -41,11 +41,7 @@ func buildTransaction(data string) string {
 
 	tx := NewTransaction(raw.Asset)
 	for _, in := range raw.Inputs {
-		if in.Deposit != nil {
-			return "invalid input with deposit"
-		} else {
-			tx.AddInput(in.Hash, in.Index)
-		}
+		tx.AddInput(in.Hash, in.Index)
 	}
 
 	for _, out := range raw.Outputs {
@@ -72,11 +68,10 @@ func buildTransaction(data string) string {
 
 type signerInput struct {
 	Inputs []struct {
-		Hash    crypto.Hash  `json:"hash"`
-		Index   int          `json:"index"`
-		Deposit *DepositData `json:"deposit,omitempty"`
-		Keys    []crypto.Key `json:"keys"`
-		Mask    crypto.Key   `json:"mask"`
+		Hash  crypto.Hash  `json:"hash"`
+		Index int          `json:"index"`
+		Keys  []crypto.Key `json:"keys"`
+		Mask  crypto.Key   `json:"mask"`
 	} `json:"inputs"`
 	Outputs []struct {
 		Type     uint8        `json:"type"`
@@ -88,20 +83,9 @@ type signerInput struct {
 	}
 	Asset crypto.Hash `json:"asset"`
 	Extra string      `json:"extra"`
-	Node  string      `json:"-"`
 }
 
 func (raw signerInput) ReadUTXO(hash crypto.Hash, index int) (*UTXOWithLock, error) {
-	utxo := &UTXOWithLock{}
-
-	for _, in := range raw.Inputs {
-		if in.Hash == hash && in.Index == index && len(in.Keys) > 0 {
-			utxo.Keys = in.Keys
-			utxo.Mask = in.Mask
-			return utxo, nil
-		}
-	}
-
 	return nil, nil
 }
 
@@ -121,18 +105,6 @@ func transactionToMap(tx *VersionedTransaction) map[string]interface{} {
 				"hash":  in.Hash,
 				"index": in.Index,
 			})
-		} else if len(in.Genesis) > 0 {
-			inputs = append(inputs, map[string]interface{}{
-				"genesis": hex.EncodeToString(in.Genesis),
-			})
-		} else if in.Deposit != nil {
-			inputs = append(inputs, map[string]interface{}{
-				"deposit": in.Deposit,
-			})
-		} else if in.Mint != nil {
-			inputs = append(inputs, map[string]interface{}{
-				"mint": in.Mint,
-			})
 		}
 	}
 
@@ -150,9 +122,6 @@ func transactionToMap(tx *VersionedTransaction) map[string]interface{} {
 		}
 		if out.Mask.HasValue() {
 			output["mask"] = out.Mask
-		}
-		if out.Withdrawal != nil {
-			output["withdrawal"] = out.Withdrawal
 		}
 		outputs = append(outputs, output)
 	}

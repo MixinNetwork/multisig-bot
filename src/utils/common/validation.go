@@ -11,10 +11,6 @@ func (ver *VersionedTransaction) Validate(store DataStore) error {
 	msg := ver.PayloadMarshal()
 	txType := tx.TransactionType()
 
-	if ver.Version < TxVersion {
-		return ver.validateV1(store)
-	}
-
 	if ver.Version != TxVersion {
 		return fmt.Errorf("invalid tx version %d %d", ver.Version, tx.Version)
 	}

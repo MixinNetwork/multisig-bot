@@ -6,7 +6,6 @@ import (
 
 type VersionedTransaction struct {
 	SignedTransaction
-	BadGenesis *SignedGenesisHackTransaction `msgpack:"-"`
 }
 
 func (tx *SignedTransaction) AsLatestVersion() *VersionedTransaction {
@@ -27,55 +26,18 @@ func (tx *Transaction) AsLatestVersion() *VersionedTransaction {
 	}
 }
 
-func DecompressUnmarshalVersionedTransaction(val []byte) (*VersionedTransaction, error) {
-	var ver VersionedTransaction
-	err := DecompressMsgpackUnmarshal(val, &ver)
-	if err == nil && ver.Version == TxVersion {
-		return &ver, nil
-	}
-	return decompressUnmarshalVersionedOne(val)
-}
-
 func UnmarshalVersionedTransaction(val []byte) (*VersionedTransaction, error) {
 	var ver VersionedTransaction
 	err := MsgpackUnmarshal(val, &ver)
-	if err == nil && ver.Version == TxVersion {
-		return &ver, nil
-	}
-	return unmarshalVersionedOne(val)
-}
-
-func (ver *VersionedTransaction) CompressMarshal() []byte {
-	switch ver.Version {
-	case TxVersion:
-		return CompressMsgpackMarshalPanic(ver.SignedTransaction)
-	case 0, 1:
-		return compressMarshalV1(ver)
-	default:
-		panic(ver.Version)
-	}
+	return &ver, err
 }
 
 func (ver *VersionedTransaction) Marshal() []byte {
-	switch ver.Version {
-	case TxVersion:
-		return MsgpackMarshalPanic(ver.SignedTransaction)
-	case 0, 1:
-		return marshalV1(ver)
-	default:
-		panic(ver.Version)
-	}
+	return MsgpackMarshalPanic(ver.SignedTransaction)
 }
 
 func (ver *VersionedTransaction) PayloadMarshal() []byte {
-	switch ver.Version {
-	case TxVersion:
-		return MsgpackMarshalPanic(ver.SignedTransaction.Transaction)
-	case 0, 1:
-		return payloadMarshalV1(ver)
-	default:
-		panic(ver.Version)
-	}
+	return MsgpackMarshalPanic(ver.SignedTransaction.Transaction)
 }
 
 func (ver *VersionedTransaction) PayloadHash() crypto.Hash {
