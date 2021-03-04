@@ -133,6 +133,7 @@ func transactionToMap(tx *VersionedTransaction) map[string]interface{} {
 		"outputs":    outputs,
 		"extra":      hex.EncodeToString(tx.Extra),
 		"hash":       tx.PayloadHash(),
+		"hex":        hex.EncodeToString(tx.PayloadMarshal()),
 		"signatures": tx.SignaturesMap,
 	}
 }

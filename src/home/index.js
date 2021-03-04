@@ -250,7 +250,7 @@ Home.prototype = {
           members.push($(this).val());
         });
         var tx = {
-          version: 1,
+          version: 2,
           asset: asset.mixin_id,
           inputs: [],
           outputs: [],
