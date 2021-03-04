@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/MixinNetwork/mixin/common"
 	"github.com/MixinNetwork/mixin/crypto"
 	"github.com/gopherjs/gopherjs/js"
 )
@@ -21,13 +20,12 @@ func decodeTransaction(input string) string {
 	if err != nil {
 		return err.Error()
 	}
-	var tx common.SignedTransaction
-	err = common.MsgpackUnmarshal(raw, &tx)
+	ver, err := UnmarshalVersionedTransaction(raw)
 	if err != nil {
 		return err.Error()
 	}
-	ver := transactionToMap(tx.AsLatestVersion())
-	data, err := json.Marshal(ver)
+	tm := transactionToMap(ver)
+	data, err := json.Marshal(tm)
 	if err != nil {
 		return err.Error()
 	}
@@ -41,7 +39,7 @@ func buildTransaction(data string) string {
 		return err.Error()
 	}
 
-	tx := common.NewTransaction(raw.Asset)
+	tx := NewTransaction(raw.Asset)
 	for _, in := range raw.Inputs {
 		if in.Deposit != nil {
 			return "invalid input with deposit"
@@ -52,7 +50,7 @@ func buildTransaction(data string) string {
 
 	for _, out := range raw.Outputs {
 		if out.Mask.HasValue() {
-			tx.Outputs = append(tx.Outputs, &common.Output{
+			tx.Outputs = append(tx.Outputs, &Output{
 				Type:   out.Type,
 				Amount: out.Amount,
 				Keys:   out.Keys,
@@ -74,27 +72,27 @@ func buildTransaction(data string) string {
 
 type signerInput struct {
 	Inputs []struct {
-		Hash    crypto.Hash         `json:"hash"`
-		Index   int                 `json:"index"`
-		Deposit *common.DepositData `json:"deposit,omitempty"`
-		Keys    []crypto.Key        `json:"keys"`
-		Mask    crypto.Key          `json:"mask"`
+		Hash    crypto.Hash  `json:"hash"`
+		Index   int          `json:"index"`
+		Deposit *DepositData `json:"deposit,omitempty"`
+		Keys    []crypto.Key `json:"keys"`
+		Mask    crypto.Key   `json:"mask"`
 	} `json:"inputs"`
 	Outputs []struct {
-		Type     uint8            `json:"type"`
-		Mask     crypto.Key       `json:"mask"`
-		Keys     []crypto.Key     `json:"keys"`
-		Amount   common.Integer   `json:"amount"`
-		Script   common.Script    `json:"script"`
-		Accounts []common.Address `json:"accounts"`
+		Type     uint8        `json:"type"`
+		Mask     crypto.Key   `json:"mask"`
+		Keys     []crypto.Key `json:"keys"`
+		Amount   Integer      `json:"amount"`
+		Script   Script       `json:"script"`
+		Accounts []Address    `json:"accounts"`
 	}
 	Asset crypto.Hash `json:"asset"`
 	Extra string      `json:"extra"`
 	Node  string      `json:"-"`
 }
 
-func (raw signerInput) ReadUTXO(hash crypto.Hash, index int) (*common.UTXOWithLock, error) {
-	utxo := &common.UTXOWithLock{}
+func (raw signerInput) ReadUTXO(hash crypto.Hash, index int) (*UTXOWithLock, error) {
+	utxo := &UTXOWithLock{}
 
 	for _, in := range raw.Inputs {
 		if in.Hash == hash && in.Index == index && len(in.Keys) > 0 {
@@ -107,15 +105,15 @@ func (raw signerInput) ReadUTXO(hash crypto.Hash, index int) (*common.UTXOWithLo
 	return nil, nil
 }
 
-func (raw signerInput) CheckDepositInput(deposit *common.DepositData, tx crypto.Hash) error {
+func (raw signerInput) CheckDepositInput(deposit *DepositData, tx crypto.Hash) error {
 	return nil
 }
 
-func (raw signerInput) ReadLastMintDistribution(group string) (*common.MintDistribution, error) {
+func (raw signerInput) ReadLastMintDistribution(group string) (*MintDistribution, error) {
 	return nil, nil
 }
 
-func transactionToMap(tx *common.VersionedTransaction) map[string]interface{} {
+func transactionToMap(tx *VersionedTransaction) map[string]interface{} {
 	var inputs []map[string]interface{}
 	for _, in := range tx.Inputs {
 		if in.Hash.HasValue() {
@@ -166,6 +164,6 @@ func transactionToMap(tx *common.VersionedTransaction) map[string]interface{} {
 		"outputs":    outputs,
 		"extra":      hex.EncodeToString(tx.Extra),
 		"hash":       tx.PayloadHash(),
-		"signatures": tx.Signatures,
+		"signatures": tx.SignaturesMap,
 	}
 }
