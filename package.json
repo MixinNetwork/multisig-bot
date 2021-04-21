@@ -9,13 +9,15 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "bot-api-js-client": "/Users/li/Javascript/bot-api-js-client",
     "core-js": "^3.6.5",
     "sass": "^1.32.10",
     "sass-loader": "10",
     "vue": "^3.0.0",
     "vue-i18n": "^9.1.6",
-    "vue-loading-template": "^1.3.2",
-    "vue-router": "^4.0.0-0"
+    "vue-inline-svg": "^3.0.0-beta.2",
+    "vue-router": "^4.0.0-0",
+    "vue-toastification": "^2.0.0-rc.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

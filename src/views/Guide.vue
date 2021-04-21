@@ -1,7 +1,7 @@
 <template>
   <div class="guide">
     <div class="tips">
-      <img src="@/assets/tips.svg" alt="tips" />
+      <img src="@/assets/images/tips.svg" alt="tips" />
     </div>
     <div class="body">
       <ul v-html="$t('guide')"></ul>
