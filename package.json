@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "bot-api-js-client": "/Users/li/Javascript/bot-api-js-client",
     "core-js": "^3.6.5",
+    "decimal.js": "^10.2.1",
     "sass": "^1.32.10",
     "sass-loader": "10",
     "vue": "^3.0.0",
