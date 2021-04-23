@@ -9,6 +9,7 @@ let storage = new Storage()
 export const ApiGetChains = () => {
   let chains = storage.getChains()
   let at = storage.getChainsUpdatedAt()
+  // cache 1 day chains
   if (chains && at && (new Date() - new Date(at) < 24 * 60 * 60 * 1000)) {
     return new Promise((resolve) => {
       resolve(JSON.parse(chains))

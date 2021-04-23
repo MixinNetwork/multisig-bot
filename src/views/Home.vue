@@ -31,7 +31,7 @@
               </div>
             </div>
             <div class="value">
-              <div class="change">
+              <div :class="['change', asset.change_usd.indexOf('-')>-1 ? 'red' : 'geen']">
                 {{ asset.change_usd }}%
               </div>
               <div class="price">
@@ -92,11 +92,6 @@
   .value {
     text-align: right;
   }
-  .price {
-    color: #B8BDC7;
-    font-size: 1.4rem;
-    margin-top: .4rem;
-  }
 }
 .item {
   display: flex;
@@ -116,6 +111,17 @@
       z-index: 99;
     }
   }
+  .price {
+    color: #B8BDC7;
+    font-size: 1.4rem;
+    margin-top: .4rem;
+  }
+  .red {
+    color: #E57874;
+  }
+  .green {
+    color: #5DBC7A;
+  }
 }
 </style>
 
@@ -129,6 +135,7 @@ import {
   ApiGetMultisigsOutputs,
   ApiGetAsset,
 } from '@/api'
+import Storage from '@/api/storage'
 
 export default {
   name: 'Home',
@@ -138,6 +145,7 @@ export default {
 
   data() {
     return {
+      storage: new Storage(),
       balanceBTC: 0,
       balanceUSD: 0,
       assets: [],
@@ -161,7 +169,7 @@ export default {
       }
     })
     let outputs = await this.loadMultisigsOutputs(participantIds, this.parseThreshold(conversation.name), '', [])
-    let assetSet = {}
+    let assetSet = this.storage.getSelectedAssets()
     for (let i=0; i< outputs.length; i++) {
       if (!assetSet[outputs[i].asset_id]) {
         assetSet[outputs[i].asset_id] = 0
@@ -175,16 +183,16 @@ export default {
     }
     let assets = await this.loadAssets(assetIds, 0, [])
     for (let i=0; i<assets.length; i++) {
-      assets[i].balance = (new Decimal(assetSet[assets[i].asset_id])).toString()
+      assets[i].balance = (new Decimal(assetSet[assets[i].asset_id])).toFixed()
       assets[i].value = (new Decimal(assets[i].balance)).times(assets[i].price_usd).toFixed(8)
       assets[i].change_usd = (new Decimal(assets[i].change_usd)).toFixed(2)
-      assets[i].price_usd = (new Decimal(assets[i].price_usd)).toFixed(8)
+      assets[i].price_usd = (new Decimal(assets[i].price_usd)).toFixed()
       assets[i].chain = chains[assets[i].chain_id]
       this.balanceBTC = (new Decimal(assets[i].balance)).times(assets[i].price_btc).plus(this.balanceBTC)
       this.balanceUSD = (new Decimal(assets[i].value)).plus(this.balanceUSD)
     }
-    this.balanceBTC = this.balanceBTC.toFixed(8)
-    this.balanceUSD = this.balanceUSD.toFixed(8)
+    this.balanceBTC = this.balanceBTC.toFixed()
+    this.balanceUSD = this.balanceUSD.toFixed()
     this.assets = assets
   },
 
