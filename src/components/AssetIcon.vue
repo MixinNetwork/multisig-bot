@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'Icon',
+  name: 'AssetIcon',
   props: {
     asset: Object,
   }

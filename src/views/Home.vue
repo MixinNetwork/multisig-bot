@@ -20,7 +20,7 @@
       <main>
         <ul>
           <li class="item" v-for="asset in assets" :key="asset.asset_id">
-            <icon :asset="asset" />
+            <asset-icon :asset="asset" />
             <div class="info">
               {{ asset.balance }} {{ asset.symbol }}
               <div class="price">
@@ -95,19 +95,6 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 3.2rem;
-  .icon {
-    width: 4.2rem;
-    position: relative;
-    .chain {
-      border: 2px solid white;
-      border-radius: .8rem;
-      width: 1.6rem;
-      position: absolute;
-      top: 60%;
-      left: 0%;
-      z-index: 99;
-    }
-  }
   .price {
     color: #B8BDC7;
     font-size: 1.4rem;
@@ -133,12 +120,12 @@ import {
   ApiGetAsset,
 } from '@/api'
 import Storage from '@/api/storage'
-import Icon from '@/components/icon'
+import AssetIcon from '@/components/AssetIcon'
 
 export default {
   name: 'Home',
   components: {
-    Icon,
+    AssetIcon,
   },
 
   data() {
