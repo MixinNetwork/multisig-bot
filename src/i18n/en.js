@@ -4,8 +4,12 @@ const global = {
 
 const home = {
   home: {
-    assets: "Assets"
-  }
+    assets: "Assets",
+    modal: {
+      title: "Assets Management",
+      search_placeholder: "Name, Symbol"
+    }
+  },
 }
 
 const guide = {

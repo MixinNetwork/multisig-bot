@@ -32,6 +32,10 @@ class Storage {
     selected = selected || '{"c6d0c728-2624-429b-8e0d-d9d19b6592fa": 0, "c94ac88f-4671-3976-b60a-09064f1811e8": 0}'
     return JSON.parse(selected)
   }
+
+  setSelectedAssets(assets) {
+    window.localStorage.setItem('selected_assets', JSON.stringify(assets))
+  }
 }
 
 export default Storage;
