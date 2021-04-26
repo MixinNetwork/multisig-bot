@@ -396,7 +396,7 @@ Home.prototype = {
       if (resp.data.length < 100) {
         return callback(filter);
       }
-      self.loadUTXOs(resp.data[resp.data.length-1].created_at, conv.participants, filter, callback);
+      self.loadUTXOs(resp.data[resp.data.length-1].created_at, conv, filter, callback);
     }, offset, 100);
   },
 
