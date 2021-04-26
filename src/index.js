@@ -1,8 +1,13 @@
+import './index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+
+import Locale from './locales';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+window.i18n = new Locale(navigator.language);
 
 ReactDOM.render(
   <React.StrictMode>
