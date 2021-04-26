@@ -47,6 +47,7 @@ import AssetIcon from '@/components/AssetIcon'
 
 import { 
   ApiGetChains, 
+  ApiGetMultisigAssets,
   ApiGetAssets,
 } from '@/api'
 import Storage from '@/api/storage'
@@ -69,6 +70,11 @@ export default {
   },
   async mounted() {
     let chains = await this.loadChains()
+    let multisigAssets = await this.loadMultisigAssets()
+    let multisigAssetSet = {}
+    for (let i=0; i< multisigAssets.length; i++) {
+      multisigAssetSet[multisigAssets[i].asset_id] = true
+    }
     let assets = await this.loadAssets()
     for (let i=0; i<assets.length; i++) {
       assets[i].chain = chains[assets[i].chain_id]
@@ -79,7 +85,9 @@ export default {
         assets[i].price_usd = new Decimal((new Decimal(assets[i].price_usd)).toFixed(2)).toFixed()
       }
     }
-    this.assets = assets.sort((a, b) => {
+    this.assets = assets.filter(asset => {
+      return multisigAssetSet[asset.asset_id] || asset.chain_id === '43d61dcd-e413-450d-80b8-101d5e903357'
+    }).sort((a, b) => {
       let value = (new Decimal(a.value)).cmp(b.value)
       if (value !== 0) {
         return -value
@@ -146,6 +154,13 @@ export default {
         return chains
       }
       return this.loadChains()
+    },
+    async loadMultisigAssets() {
+      let assets = await ApiGetMultisigAssets()
+      if (assets.data) {
+        return assets.data
+      }
+      return this.loadMultisigAssets()
     },
     async loadAssets() {
       let assets = await ApiGetAssets()

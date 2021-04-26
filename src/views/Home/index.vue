@@ -14,7 +14,7 @@
         <div class="title">
           {{ $t('home.assets') }}
         </div>
-        <inline-svg v-on:click="showModal()" :src="require('@/assets/images/ic_setting.svg')" fill="#C4C4C4" />
+        <inline-svg v-on:click="showModal()" :src="require('@/assets/images/ic_setting.svg')" />
       </header>
       <main>
         <ul>
