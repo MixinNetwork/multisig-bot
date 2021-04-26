@@ -1,6 +1,6 @@
 <template>
   <div class="auth">
-    <inline-svg :src="require('@/assets/images/loading-spin.svg')"
+    <inline-svg :src="require('@/statics/images/loading-spin.svg')"
        fill="#3D3F4A"
        width="32" />
       {{ $t('loading') }}

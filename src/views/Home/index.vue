@@ -1,6 +1,6 @@
 <template>
   <assets-modal v-if="modal" v-model="modal"></assets-modal>
-  <div v-else class="home" :style="{ backgroundImage: `url(${require('@/assets/images/bg_texture.png')})` }">
+  <div v-else class="home" :style="{ backgroundImage: `url(${require('@/statics/images/bg_texture.png')})` }">
     <div class="balance">
       <div class="btc">
         {{ balanceBTC }} <span>BTC</span>
@@ -14,7 +14,7 @@
         <div class="title">
           {{ $t('home.assets') }}
         </div>
-        <inline-svg v-on:click="showModal()" :src="require('@/assets/images/ic_setting.svg')" />
+        <inline-svg v-on:click="showModal()" :src="require('@/statics/images/ic_setting.svg')" />
       </header>
       <main>
         <ul>

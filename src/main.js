@@ -1,4 +1,4 @@
-import '@/assets/scss/index.scss'
+import '@/statics/scss/index.scss'
 import { createApp } from 'vue'
 import InlineSvg from 'vue-inline-svg'
 

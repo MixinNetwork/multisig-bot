@@ -5,18 +5,18 @@
         <div class="title">
           {{ $t('home.modal.title') }}
         </div>
-        <inline-svg @click="hideModal" :src="require('@/assets/images/ic_close.svg')" fill="#C4C4C4" />
+        <inline-svg @click="hideModal" :src="require('@/statics/images/ic_close.svg')" fill="#C4C4C4" />
       </header>
       <div class="search">
-        <inline-svg :src="require('@/assets/images/ic_search.svg')" />
+        <inline-svg :src="require('@/statics/images/ic_search.svg')" />
           <input :placeholder="$t('home.modal.search_placeholder')" v-model="text">
       </div>
       <main>
         <ul>
           <li class="item" v-for="asset in getAssets" :key="asset.asset_id" v-on:click="toggleSelect(asset.asset_id)">
             <div class="state">
-              <inline-svg v-if="asset.selected" :src="require('@/assets/images/ic_selected.svg')" > </inline-svg>
-              <inline-svg v-else :src="require('@/assets/images/ic_select.svg')" > </inline-svg>
+              <inline-svg v-if="asset.selected" :src="require('@/statics/images/ic_selected.svg')" > </inline-svg>
+              <inline-svg v-else :src="require('@/statics/images/ic_select.svg')" > </inline-svg>
 
             </div>
             <asset-icon :asset="asset"> </asset-icon>
