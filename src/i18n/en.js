@@ -7,9 +7,19 @@ const home = {
     assets: "Assets",
     modal: {
       title: "Assets Management",
-      search_placeholder: "Name, Symbol"
+      search_placeholder: "Name, Symbol",
     }
   },
+}
+
+const asset = {
+  asset: {
+    action: {
+      send: "Send",
+      receive: "Receive"
+    },
+    blank: "NO TRANSACTION",
+  }
 }
 
 const guide = {
@@ -21,5 +31,6 @@ const guide = {
 export default {
   ...global,
   ...home,
-  ...guide
+  ...guide,
+  ...asset,
 }

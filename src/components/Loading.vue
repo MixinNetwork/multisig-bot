@@ -1,5 +1,5 @@
 <template>
-  <div class="auth">
+  <div class="loading">
     <inline-svg :src="require('@/statics/images/loading-spin.svg')"
        fill="#3D3F4A"
        width="32" />
@@ -7,8 +7,14 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.auth {
+<script>
+export default {
+  name: "Loading"
+}
+</script>
+
+<style>
+.loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,17 +26,3 @@
   }
 }
 </style>
-
-<script>
-//import { ApiPostAuthenticate } from '@/api'
-
-export default {
-  name: 'Auth',
-  /*
-  async mounted() {
-    let token = await ApiPostAuthenticate(this.$route.query.code)
-    console.log("token", token)
-  }
-   */
-}
-</script>

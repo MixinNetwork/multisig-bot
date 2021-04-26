@@ -18,22 +18,24 @@
       </header>
       <main>
         <ul>
-          <li class="item" v-for="asset in assets" :key="asset.asset_id">
-            <asset-icon :asset="asset" />
-            <div class="info">
-              {{ asset.balance }} {{ asset.symbol }}
-              <div class="price">
-              ≈ ${{ asset.value }}
-              </div>
-            </div>
-            <div class="value">
-              <div :class="['change', asset.change_usd.indexOf('-')>-1 ? 'red' : 'geen']">
-                {{ asset.change_usd }}%
-              </div>
-              <div class="price">
-                ${{ asset.price_usd }}
-              </div>
-            </div>
+          <li v-for="asset in assets" :key="asset.asset_id">
+            <router-link class="item" :to="`/assets/${asset.asset_id}`">
+              <asset-icon :asset="asset" />
+                <div class="info">
+                  {{ asset.balance }} {{ asset.symbol }}
+                  <div class="price">
+                    ≈ ${{ asset.value }}
+                  </div>
+                </div>
+                <div class="value">
+                  <div :class="['change', asset.change_usd.indexOf('-')>=0 ? 'red' : 'green']">
+                    {{ asset.change_usd }}%
+                  </div>
+                  <div class="price">
+                    ${{ asset.price_usd }}
+                  </div>
+                </div>
+            </router-link>
           </li>
         </ul>
       </main>
@@ -44,8 +46,8 @@
 <script>
 // TODO: add animation
 let Decimal = require('decimal.js');
-
 import mixin from 'bot-api-js-client'
+
 import { 
   ApiGetChains, 
   ApiGetConversation, 
@@ -53,6 +55,7 @@ import {
   ApiGetAsset,
 } from '@/api'
 import Storage from '@/api/storage'
+import util from '@/api/util'
 import AssetIcon from '@/components/AssetIcon'
 import AssetsModal from '@/views/Home/AssetsModal'
 
@@ -90,19 +93,10 @@ export default {
     showModal() {
       this.modal = true
     },
-    parseThreshold(name) {
-      name = name || ''
-      var parts = name.split('^');
-      if (parts.length != 2) {
-        return -1;
-      }
-      var t = parseInt(parts[1]);
-      return t ? t : -1;
-    },
     async loadFullData() {
       let conversation = await this.loadConversation()
       if (!conversation || conversation.category !== 'GROUP' || 
-        this.parseThreshold(conversation.name) < 1 ||
+        util.parseThreshold(conversation.name) < 1 ||
         conversation.participants.length < 3) {
         this.$router.push('/guide')
       }
@@ -114,7 +108,7 @@ export default {
         }
       })
       // multisig output assets will always display
-      let outputs = await this.loadMultisigsOutputs(participantIds, this.parseThreshold(conversation.name), '', [])
+      let outputs = await this.loadMultisigsOutputs(participantIds, util.parseThreshold(conversation.name), '', [])
       let assetSet = this.storage.getSelectedAssets()
       for (let i=0; i<outputs.length; i++) {
         if (!assetSet[outputs[i].asset_id]) {
@@ -235,6 +229,7 @@ export default {
   }
 }
 .item {
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
