@@ -23,10 +23,49 @@ class Modal extends Component {
       assets: [],
       selectedAssets: {},
     };
+
+    this.handleChange = this.handleChange.bind(this);
     this.toggleSelect = this.toggleSelect.bind(this);
   }
 
-  toggleSelect(asset) {
+  handleChange(e) {
+    const {name, value} = e.target;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  filteredAssets() {
+    let state = this.state;
+    let text = state.text.toLowerCase()
+    if (text.length > 0) {
+      let assets = state.assets.filter(asset => {
+        return asset.symbol.toLowerCase() === text
+      })
+      if (assets.length > 0) {
+        return assets
+      }
+      assets = state.assets.filter(asset => {
+        return asset.name.toLowerCase() === text
+      })
+      if (assets.length > 0) {
+        return assets
+      }
+      assets = state.assets.filter(asset => {
+        return asset.symbol.toLowerCase().includes(text)
+      })
+      if (assets.length > 0) {
+        return assets
+      }
+      assets = state.assets.filter(asset => {
+        return asset.name.toLowerCase().includes(text)
+      })
+      return assets
+    }
+    return state.assets
+  }
+
+    toggleSelect(asset) {
     let assets = this.state.selectedAssets;
     if (this.state.selectedAssets[asset] === 0) {
       delete assets[asset];
@@ -100,7 +139,7 @@ class Modal extends Component {
     const i18n = window.i18n;
     let state  = this.state;
 
-    let assets = state.assets.map((asset) => {
+    let assets = this.filteredAssets().map((asset) => {
       return (
         <li className={ styles.item } key={ asset.asset_id } onClick={ () => this.toggleSelect(asset.asset_id) }>
           <div className={ styles.state }>
@@ -136,7 +175,7 @@ class Modal extends Component {
           </header>
           <div className={ styles.search }>
             <SearchIcon> </SearchIcon>
-            <input placeholder={ i18n.t('home.modal.search_placeholder') } v-model="text" />
+            <input name="text" placeholder={ i18n.t('home.modal.search_placeholder') } value={ state.text } onChange={this.handleChange} />
           </div>
           <main>
             <ul>
