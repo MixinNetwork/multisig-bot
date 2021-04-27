@@ -1,0 +1,74 @@
+.modal {
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.container {
+  background: white;
+  border-radius: 1.3rem 1.3rem 0 0;
+  height: 90%;
+  padding: 3rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+}
+.search {
+  background: #F5F7FA;
+  border-radius: 2rem;
+}
+main {
+  flex-grow: 1;
+  overflow: auto;
+}
+header {
+  display: flex;
+  margin-bottom: 2rem;
+  .title {
+    flex-grow: 1;
+  }
+}
+.search {
+  margin-bottom: 3rem;
+  padding: 1.2rem 1.6rem;
+  display: flex;
+  align-items: center;
+  input {
+    background: #F5F7FA;
+    border: none;
+    font-size: 1.6rem;
+    padding: 0 1.2rem;
+  }
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3.2rem;
+  .state {
+    padding-right: 1.2rem;
+  }
+  .price {
+    color: #B8BDC7;
+    font-size: 1.4rem;
+    margin-top: .4rem;
+  }
+  .red {
+    color: #E57874;
+  }
+  .green {
+    color: #5DBC7A;
+  }
+  .info {
+    flex-grow: 1;
+    padding-left: 1.6rem;
+  }
+  .value {
+    text-align: right;
+  }
+}

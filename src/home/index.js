@@ -1,4 +1,4 @@
-import styles from './index.module.scss';
+import styles from './index.module.scss'; // styles is create-react-app
 import React, { Component } from 'react';
 import Decimal from 'decimal.js';
 import mixin from 'bot-api-js-client'
@@ -9,12 +9,13 @@ import {
   ApiGetConversation,
   ApiGetMultisigsOutputs,
   ApiGetAsset,
-} from '../api'
-import util from '../api/util'
-import storage from '../api/storage'
-import AssetIcon from '../components/cover.js'
+} from '../api';
+import util from '../api/util.js';
+import storage from '../api/storage.js';
+import AssetIcon from '../components/cover.js';
 import background from "../statics/images/bg_texture.png";
 import { ReactComponent as SettingIcon } from '../statics/images/ic_setting.svg';
+import Modal from './modal.js';
 
 class Index extends Component {
   constructor(props) {
@@ -24,6 +25,7 @@ class Index extends Component {
       balanceBTC: 0,
       balanceUSD: 0,
       assets: [],
+      modal: true,
       loading: true,
     };
   }
@@ -177,6 +179,7 @@ class Index extends Component {
             </ul>
           </main>
         </div>
+        <Modal />
       </div>
     );
   }
