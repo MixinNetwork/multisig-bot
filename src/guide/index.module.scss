@@ -1,0 +1,29 @@
+.guide {
+  min-height: 100vh;
+  padding: 0 2.4rem 20rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.icon {
+  margin-bottom: 6rem;
+}
+.body {
+  padding-left: 1rem;
+  li {
+    margin-bottom: 1rem;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      left: -1rem;
+      top: .8rem;
+      background: #333;
+      display: inline-block;
+      width: .4rem;
+      height: .4rem;
+      border-radius: .2rem;
+    }
+  }
+}
