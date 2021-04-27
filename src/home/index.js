@@ -2,6 +2,7 @@ import styles from './index.module.scss';
 import React, { Component } from 'react';
 import Decimal from 'decimal.js';
 import mixin from 'bot-api-js-client'
+import { Link } from 'react-router-dom';
 
 import {
   ApiGetChains,
@@ -11,7 +12,7 @@ import {
 } from '../api'
 import util from '../api/util'
 import storage from '../api/storage'
-
+import AssetIcon from '../components/cover.js'
 import background from "../statics/images/bg_texture.png";
 import { ReactComponent as SettingIcon } from '../statics/images/ic_setting.svg';
 
@@ -37,7 +38,7 @@ class Index extends Component {
     let participantIds = []
     conversation.participants.forEach(p => {
       // skip current and old multisig bot
-      if (process.env.VUE_APP_CLIENT_ID !== p.user_id && '37e040ec-df91-47a7-982e-0e118932fa8b' !== p.user_id) {
+      if (process.env.REACT_APP_CLIENT_ID !== p.user_id && '37e040ec-df91-47a7-982e-0e118932fa8b' !== p.user_id) {
         participantIds.push(p.user_id)
       }
     })
@@ -67,8 +68,8 @@ class Index extends Component {
       balanceBTC = (new Decimal(assets[i].balance)).times(assets[i].price_btc).plus(balanceBTC)
       balanceUSD = (new Decimal(assets[i].value)).plus(balanceUSD)
     }
-    balanceBTC = this.balanceBTC.toFixed()
-    balanceUSD = this.balanceUSD.toFixed()
+    balanceBTC = balanceBTC.toFixed()
+    balanceUSD = balanceUSD.toFixed()
     assets = assets.sort((a, b) => {
       let value = (new Decimal(a.value)).cmp(b.value)
       if (value !== 0) {
@@ -131,24 +132,24 @@ class Index extends Component {
 
     let assets = state.assets.map((asset) => {
       return (
-        <li v-for="asset in assets" key={ asset.asset_id }>
-          <router-link className="item" to="`/assets/${asset.asset_id}`">
-            {/*<asset-icon :asset="asset" /> */}
-            <div className="info">
+        <li key={ asset.asset_id }>
+          <Link className={ styles.item } to={ `/assets/${asset.asset_id}` }>
+            <AssetIcon asset={ asset } />
+            <div className={ styles.info }>
               { asset.balance } { asset.symbol }
-              <div className="price">
+              <div className={ styles.price }>
                 ≈ ${ asset.value }
               </div>
             </div>
-            <div className="value">
-              <div className="['change', asset.change_usd.indexOf('-')>=0 ? 'red' : 'green']">
+            <div className={ styles.value }>
+              <div className={ asset.change_usd.indexOf('-')>=0 ? styles.red : styles.green }>
                 { asset.change_usd }%
               </div>
-              <div className="price">
+              <div className={ styles.price }>
                 ${ asset.price_usd }
               </div>
             </div>
-          </router-link>
+          </Link>
         </li>
       );
     });

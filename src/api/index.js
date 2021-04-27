@@ -56,7 +56,7 @@ export const ApiGetConversation = (id) => {
 }
 
 export const ApiPostAuthenticate = (code) => {
-  let clientId = process.env.VUE_APP_CLIENT_ID
+  let clientId = process.env.REACT_APP_CLIENT_ID
   let params = {
     "client_id": clientId,
     "code": code,
