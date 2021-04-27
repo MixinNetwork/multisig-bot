@@ -6,9 +6,9 @@ import {
   ApiGetChains,
   ApiGetMultisigAssets,
   ApiGetAssets,
-} from '../api'
-import storage from '../api/storage.js'
-import AssetIcon from '../components/cover.js'
+} from '../api';
+import storage from '../api/storage.js';
+import AssetIcon from '../components/cover.js';
 import { ReactComponent as CloseIcon } from '../statics/images/ic_close.svg';
 import { ReactComponent as SearchIcon } from '../statics/images/ic_search.svg';
 import { ReactComponent as SelectIcon } from '../statics/images/ic_select.svg';
@@ -65,7 +65,7 @@ class Modal extends Component {
     return state.assets
   }
 
-    toggleSelect(asset) {
+  toggleSelect(asset) {
     let assets = this.state.selectedAssets;
     if (this.state.selectedAssets[asset] === 0) {
       delete assets[asset];
@@ -78,27 +78,27 @@ class Modal extends Component {
   }
 
   async loadChains() {
-    let chains = await ApiGetChains()
+    let chains = await ApiGetChains();
     if (!chains.error) {
-      return chains
+      return chains;
     }
-    return this.loadChains()
+    return this.loadChains();
   }
 
   async loadMultisigAssets() {
-    let assets = await ApiGetMultisigAssets()
+    let assets = await ApiGetMultisigAssets();
     if (assets.data) {
-      return assets.data
+      return assets.data;
     }
-    return this.loadMultisigAssets()
+    return this.loadMultisigAssets();
   }
 
   async loadAssets() {
-    let assets = await ApiGetAssets()
+    let assets = await ApiGetAssets();
     if (assets.data) {
-      return assets.data
+      return assets.data;
     }
-    return this.loadAssets()
+    return this.loadAssets();
   }
 
   async loadFullData() {
@@ -122,11 +122,11 @@ class Modal extends Component {
       // All erc20 tokens are multisig asset
       return multisigAssetSet[asset.asset_id] || asset.chain_id === '43d61dcd-e413-450d-80b8-101d5e903357'
     }).sort((a, b) => {
-      let value = (new Decimal(a.value)).cmp(b.value)
-      if (value !== 0) {
-        return -value
+      let value = (new Decimal(a.value)).cmp(b.value);
+      if (value !== 0) {;
+        return -value;
       }
-      return -(new Decimal(a.price_usd)).cmp(b.price_usd)
+      return -(new Decimal(a.price_usd)).cmp(b.price_usd);
     });
     this.setState({ assets: assets, selectedAssets: storage.getSelectedAssets() });
   }
