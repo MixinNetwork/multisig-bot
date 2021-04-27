@@ -1,0 +1,15 @@
+.loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 16rem;
+
+  svg {
+    width: 3.6rem;
+  }
+  .text {
+    margin-top: .8rem;
+  }
+}

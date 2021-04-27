@@ -6,7 +6,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "bot-api-js-client": "^1.0.4",
+    "axios": "^0.21.1",
+    "bot-api-js-client": "/Users/li/Javascript/bot-api-js-client",
     "node-polyglot": "^2.4.0",
     "node-sass": "^5.0.0",
     "react": "^17.0.2",
@@ -19,7 +20,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "__eject__": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }
