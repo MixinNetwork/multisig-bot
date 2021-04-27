@@ -23,6 +23,7 @@ class Modal extends Component {
       assets: [],
       selectedAssets: {},
     };
+    this.toggleSelect = this.toggleSelect.bind(this);
   }
 
   toggleSelect(asset) {
@@ -79,6 +80,7 @@ class Modal extends Component {
       }
     }
     assets = assets.filter(asset => {
+      // All erc20 tokens are multisig asset
       return multisigAssetSet[asset.asset_id] || asset.chain_id === '43d61dcd-e413-450d-80b8-101d5e903357'
     }).sort((a, b) => {
       let value = (new Decimal(a.value)).cmp(b.value)
@@ -100,7 +102,7 @@ class Modal extends Component {
 
     let assets = state.assets.map((asset) => {
       return (
-        <li className={ styles.item } key={ asset.asset_id } onClick={ (e) => this.toggleSelect(asset.asset_id, e) }>
+        <li className={ styles.item } key={ asset.asset_id } onClick={ () => this.toggleSelect(asset.asset_id) }>
           <div className={ styles.state }>
             { state.selectedAssets[asset.asset_id] === 0 ? <SelectedIcon /> : <SelectIcon /> }
           </div>
