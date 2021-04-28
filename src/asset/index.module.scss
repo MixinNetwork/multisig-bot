@@ -57,7 +57,42 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding-bottom: 6rem;
 }
 .text {
   margin-top: 2.4rem;
+}
+.transactions {
+  background: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 1.6rem 1.6rem;
+  flex-grow: 1;
+  padding: 2rem 1.6rem;
+  header {
+    font-size: 1.4rem;
+  }
+  .hint {
+    color: #B8BDC7;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+  }
+  .item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 2.8rem;
+  }
+  .memo {
+    flex-grow: 1;
+    overflow: hidden;
+    padding-right: 1.6rem;
+  }
+  .amount {
+    padding: 0 .5rem 0 2rem;
+  }
+  .symbol {
+    font-size: 1.4rem;
+  }
 }

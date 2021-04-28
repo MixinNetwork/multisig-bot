@@ -22,6 +22,7 @@ class Index extends Component {
     this.state = {
       assetId: props.match.params.id,
       asset: {},
+      outputs: [],
       loading: true,
     };
   }
@@ -36,6 +37,7 @@ class Index extends Component {
     }
     return this.loadConversation();
   }
+
   async loadAsset() {
     let asset = await ApiGetAsset(this.state.assetId);
     if (asset.data) {
@@ -43,6 +45,7 @@ class Index extends Component {
     }
     return this.loadAsset();
   }
+
   async loadChains() {
     let chains = await ApiGetChains();
     if (!chains.error) {
@@ -50,6 +53,7 @@ class Index extends Component {
     }
     return this.loadChains();
   }
+
   async loadMultisigsOutputs(participants, threshold, offset, utxo) {
     let outputs = await ApiGetMultisigsOutputs(participants, threshold, '', threshold);
     if (outputs.data) {
@@ -74,9 +78,13 @@ class Index extends Component {
         participants.push(p.user_id);
       }
     });
+    let transactions = [];
     let outputs = await that.loadMultisigsOutputs(participants, util.parseThreshold(conversation.name), '', []);
     let balance = outputs.reduce((a, c) => {
       if (c.asset_id === that.state.assetId && c.state === 'unspent') {
+        if (transactions.length < 50) {
+          transactions.push(c); // Only list lastest 50 transactions
+        }
         return a.plus(c.amount);
       }
       return a;
@@ -86,7 +94,7 @@ class Index extends Component {
     asset.balance = balance.toFixed();
     asset.value = (new Decimal(balance.times(asset.price_usd).toFixed(8))).toFixed();
     asset.chain = chains[asset.chain_id];
-    this.setState({ asset: asset, loading: false });
+    this.setState({ asset: asset, outputs: transactions, loading: false });
   }
 
   componentDidMount() {
@@ -102,6 +110,51 @@ class Index extends Component {
         <Loading />
       );
     }
+
+    let blank = (
+      <div className={ styles.blank }>
+        <TransactionIcon />
+        <div className={ styles.text }>
+          { i18n.t('asset.blank') }
+        </div>
+      </div>
+    );
+
+    let hint = 100;
+    let transactionList = state.outputs.map((o) => {
+      let created = new Date(o.created_at);
+      let divide = hint !== created.getDate();
+      hint = created.getDate();
+      return (
+        <li key={ o.utxo_id }>
+          { divide && (
+            <div className={ styles.hint }>
+              { `${created.getMonth() + 1 }/${ created.getDate() }/${ created.getFullYear() }` }
+            </div>
+          )}
+          <div className={ styles.item }>
+            <div className={ styles.memo }>
+              { o.Memo || i18n.t('asset.memo') }
+            </div>
+            <div className={ styles.amount  + ` ${ o.amount >= 0 ? 'green' : 'red' }`}>
+              { o.amount >= 0 ? '+' : '-' }{ o.amount }
+            </div>
+            <div className={ styles.symbol }>
+              { state.asset.symbol }
+            </div>
+          </div>
+        </li>
+      );
+    });
+
+    let transactions = (
+      <div className={ styles.transactions }>
+        <header> { i18n.t('asset.transactions') } </header>
+        <ul>
+          { transactionList }
+        </ul>
+      </div>
+    );
 
     return (
       <div className={ styles.asset } style={{ backgroundImage: `url(${ background })` }}>
@@ -120,12 +173,8 @@ class Index extends Component {
             { i18n.t('asset.action.receive') }
           </div>
         </div>
-        <div className={ styles.blank }>
-          <TransactionIcon />
-          <div className={ styles.text }>
-            { i18n.t('asset.blank') }
-          </div>
-        </div>
+        { state.outputs.length === 0 && blank }
+        { state.outputs.length > 0 && transactions }
       </div>
     );
   }

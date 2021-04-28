@@ -38,3 +38,10 @@ ul, ol {
 img {
   max-width: 100%;
 }
+
+.red {
+  color: #E57874;
+}
+.green {
+  color: #5DBC7A;
+}

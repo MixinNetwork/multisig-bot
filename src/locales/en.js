@@ -19,6 +19,8 @@ const asset = {
       receive: "Receive"
     },
     blank: "NO TRANSACTION",
+    memo: "TRANSACTION",
+    transactions: "Transactions",
   },
 }
 
