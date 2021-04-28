@@ -171,7 +171,7 @@ class Modal extends Component {
             <div className={ styles.title }>
               { i18n.t('home.modal.title') }
             </div>
-            <CloseIcon> </CloseIcon>
+            <CloseIcon onClick={ () => this.props.handleModal(false) } />
           </header>
           <div className={ styles.search }>
             <SearchIcon> </SearchIcon>

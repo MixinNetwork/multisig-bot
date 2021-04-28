@@ -25,9 +25,15 @@ class Index extends Component {
       balanceBTC: 0,
       balanceUSD: 0,
       assets: [],
-      modal: true,
+      modal: false,
       loading: true,
     };
+
+    this.handleModal = this.handleModal.bind(this);
+  }
+
+  handleModal(b) {
+    this.setState({modal: b});
   }
 
   async loadFullData() {
@@ -128,6 +134,12 @@ class Index extends Component {
     this.loadFullData();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.modal && !this.state.modal) {
+      this.loadFullData();
+    }
+  }
+
   render() {
     const i18n = window.i18n;
     let state  = this.state;
@@ -171,7 +183,7 @@ class Index extends Component {
             <div className={ styles.title }>
               { i18n.t('home.assets') }
             </div>
-            <SettingIcon />
+            <SettingIcon onClick={ () => this.handleModal(true) } />
           </header>
           <main>
             <ul>
@@ -179,7 +191,7 @@ class Index extends Component {
             </ul>
           </main>
         </div>
-        <Modal />
+        { state.modal && <Modal handleModal={ this.handleModal } /> }
       </div>
     );
   }
