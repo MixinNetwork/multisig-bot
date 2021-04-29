@@ -12,6 +12,7 @@ import {
 import util from '../api/util.js';
 import AssetIcon from '../components/cover.js';
 import Loading from '../components/loading.js';
+import Modal from './modal.js';
 import background from "../statics/images/bg.png";
 import { ReactComponent as TransactionIcon } from '../statics/images/ic_transaction.svg';
 
@@ -23,6 +24,7 @@ class Index extends Component {
       assetId: props.match.params.id,
       asset: {},
       outputs: [],
+      modal: true,
       loading: true,
     };
   }
@@ -175,6 +177,7 @@ class Index extends Component {
         </div>
         { state.outputs.length === 0 && blank }
         { state.outputs.length > 0 && transactions }
+        { state.modal && <Modal /> }
       </div>
     );
   }

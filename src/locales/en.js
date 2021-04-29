@@ -21,6 +21,11 @@ const asset = {
     blank: "NO TRANSACTION",
     memo: "TRANSACTION",
     transactions: "Transactions",
+    modal: {
+      title: "Send To",
+      wallet: "Transfer from wallet",
+      recipient: "Pay by others",
+    }
   },
 }
 

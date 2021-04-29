@@ -174,7 +174,7 @@ class Modal extends Component {
             <CloseIcon onClick={ () => this.props.handleModal(false) } />
           </header>
           <div className={ styles.search }>
-            <SearchIcon> </SearchIcon>
+            <SearchIcon />
             <input name="text" placeholder={ i18n.t('home.modal.search_placeholder') } value={ state.text } onChange={this.handleChange} />
           </div>
           <main>
