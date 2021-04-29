@@ -34,6 +34,7 @@ const transfer = {
     balance: "BALANCE",
     amount: "Amount",
     memo: "Memo",
+    forward: "Send to others",
   },
 };
 

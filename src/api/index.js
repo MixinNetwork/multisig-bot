@@ -78,3 +78,7 @@ export const ApiPostAuthenticate = (code) => {
     return resp;
   });
 }
+
+export const ApiPostPayments = (params) => {
+  return client.requestByToken('POST', '/payments', params, storage.getToken())
+}
