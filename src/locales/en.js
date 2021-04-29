@@ -1,6 +1,6 @@
 const global = {
   loading: "Loading...",
-}
+};
 
 const home = {
   home: {
@@ -10,7 +10,7 @@ const home = {
       search_placeholder: "Name, Symbol",
     },
   },
-}
+};
 
 const asset = {
   asset: {
@@ -25,9 +25,17 @@ const asset = {
       title: "Send To",
       wallet: "Transfer from wallet",
       recipient: "Pay by others",
-    }
+    },
   },
-}
+};
+
+const transfer = {
+  transfer: {
+    balance: "BALANCE",
+    amount: "Amount",
+    memo: "Memo",
+  },
+};
 
 const guide = {
   guide: `
@@ -35,13 +43,14 @@ const guide = {
   <li>Append <strong>^T</strong> to the end of the group name.<em><b>T</b> is the threshold of signers.</em></li>
   <li>Invite me to the group and open me from there.</li>
   `,
-}
+};
 
 const locale = {
   ...global,
   ...home,
   ...guide,
   ...asset,
+  ...transfer,
 };
 
 export default locale;

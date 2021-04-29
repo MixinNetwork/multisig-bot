@@ -1,4 +1,7 @@
 import styles from './modal.module.scss';
+
+import { Link } from 'react-router-dom';
+
 import { ReactComponent as CloseIcon } from '../statics/images/ic_close.svg';
 import { ReactComponent as GreaterIcon } from '../statics/images/ic_greater.svg';
 import { ReactComponent as WalletIcon } from '../statics/images/ic_wallet.svg';
@@ -17,20 +20,20 @@ function Modal(props) {
           <CloseIcon onClick={ () => { props.handleModal(false) } } />
         </header>
         <main>
-          <div className={ styles.action }>
+          <Link to={ `/assets/${ props.asset.asset_id }/transfer` } className={ styles.action }>
             <WalletIcon />
             <div className={ styles.text }>
               { i18n.t('asset.modal.wallet') }
             </div>
             <GreaterIcon />
-          </div>
-          <div className={ styles.action }>
+          </Link>
+          <Link to={ `/assets/${ props.asset.asset_id }/recipient` } className={ styles.action }>
             <LinkIcon />
             <div className={ styles.text }>
               { i18n.t('asset.modal.recipient') }
             </div>
             <GreaterIcon />
-          </div>
+          </Link>
         </main>
       </div>
     </div>

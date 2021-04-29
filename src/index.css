@@ -27,6 +27,7 @@ code {
 }
 
 a {
+  color: #333;
   cursor: pointer;
   text-decoration: none;
 }
@@ -37,6 +38,10 @@ ul, ol {
 
 img {
   max-width: 100%;
+}
+
+input, textarea {
+  font-size: 1.6rem;
 }
 
 .red {

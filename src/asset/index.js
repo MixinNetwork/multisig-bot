@@ -185,7 +185,7 @@ class Index extends Component {
         </div>
         { state.outputs.length === 0 && blank }
         { state.outputs.length > 0 && transactions }
-        { state.modal && <Modal handleModal={ this.handleModal } /> }
+        { state.modal && <Modal asset={ state.asset }handleModal={ this.handleModal } /> }
       </div>
     );
   }
