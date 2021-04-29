@@ -4,7 +4,7 @@ import { ReactComponent as GreaterIcon } from '../statics/images/ic_greater.svg'
 import { ReactComponent as WalletIcon } from '../statics/images/ic_wallet.svg';
 import { ReactComponent as LinkIcon } from '../statics/images/ic_link.svg';
 
-function Modal() {
+function Modal(props) {
   const i18n = window.i18n;
 
   return (
@@ -14,7 +14,7 @@ function Modal() {
           <div className={ styles.title }>
             { i18n.t('asset.modal.title') }
           </div>
-          <CloseIcon />
+          <CloseIcon onClick={ () => { props.handleModal(false) } } />
         </header>
         <main>
           <div className={ styles.action }>

@@ -24,9 +24,15 @@ class Index extends Component {
       assetId: props.match.params.id,
       asset: {},
       outputs: [],
-      modal: true,
+      modal: false,
       loading: true,
     };
+
+    this.handleModal = this.handleModal.bind(this);
+  }
+
+  handleModal(b) {
+    this.setState({modal: b});
   }
 
   async loadConversation() {
@@ -169,15 +175,17 @@ class Index extends Component {
             ≈ ${ state.asset.value }
           </div>
           <div className={ styles.actions }>
-            { i18n.t('asset.action.send') }
+            <div  onClick={ () => this.handleModal(true)}>
+              { i18n.t('asset.action.send') }
+            </div>
             <div className={ styles.divide }>
             </div>
-            { i18n.t('asset.action.receive') }
+            <div>{ i18n.t('asset.action.receive') }</div>
           </div>
         </div>
         { state.outputs.length === 0 && blank }
         { state.outputs.length > 0 && transactions }
-        { state.modal && <Modal /> }
+        { state.modal && <Modal handleModal={ this.handleModal } /> }
       </div>
     );
   }
