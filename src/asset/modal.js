@@ -1,5 +1,4 @@
 import styles from './modal.module.scss';
-
 import { Link } from 'react-router-dom';
 
 import { ReactComponent as CloseIcon } from '../statics/images/ic_close.svg';
@@ -17,7 +16,7 @@ function Modal(props) {
           <div className={ styles.title }>
             { i18n.t('asset.modal.title') }
           </div>
-          <CloseIcon onClick={ () => { props.handleModal(false) } } />
+          <CloseIcon onClick={ () => { props.handleReceive(false) } } />
         </header>
         <main>
           <Link to={ `/assets/${ props.asset.asset_id }/transfer` } className={ styles.action }>

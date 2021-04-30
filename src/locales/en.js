@@ -26,6 +26,10 @@ const asset = {
       wallet: "Transfer from wallet",
       recipient: "Pay by others",
     },
+    contacts: {
+      title: "Send to friends",
+      search_placeholder: "Mixin ID, Name",
+    },
   },
 };
 
@@ -40,7 +44,7 @@ const transfer = {
       title: "Multisig Payment",
       description: "From %{body}",
       icon_url: "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
-    }
+    },
   },
 };
 

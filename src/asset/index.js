@@ -13,6 +13,7 @@ import util from '../api/util.js';
 import AssetIcon from '../components/cover.js';
 import Loading from '../components/loading.js';
 import Modal from './modal.js';
+import Contacts from './contacts.js';
 import background from "../statics/images/bg.png";
 import { ReactComponent as TransactionIcon } from '../statics/images/ic_transaction.svg';
 
@@ -24,15 +25,21 @@ class Index extends Component {
       assetId: props.match.params.id,
       asset: {},
       outputs: [],
-      modal: false,
+      receive: false,
+      send: true,
       loading: true,
     };
 
-    this.handleModal = this.handleModal.bind(this);
+    this.handleReceive = this.handleReceive.bind(this);
+    this.handleSend = this.handleSend.bind(this);
   }
 
-  handleModal(b) {
-    this.setState({modal: b});
+  handleReceive(b) {
+    this.setState({receive: b});
+  }
+
+  handleSend(b) {
+    this.setState({send: b});
   }
 
   async loadConversation() {
@@ -175,17 +182,20 @@ class Index extends Component {
             ≈ ${ state.asset.value }
           </div>
           <div className={ styles.actions }>
-            <div>
+            <div onClick={ () => this.handleSend(true)}>
               { i18n.t('asset.action.send') }
             </div>
             <div className={ styles.divide }>
             </div>
-            <div onClick={ () => this.handleModal(true)}>{ i18n.t('asset.action.receive') }</div>
+            <div onClick={ () => this.handleReceive(true)}>
+              { i18n.t('asset.action.receive') }
+            </div>
           </div>
         </div>
         { state.outputs.length === 0 && blank }
         { state.outputs.length > 0 && transactions }
-        { state.modal && <Modal asset={ state.asset }handleModal={ this.handleModal } /> }
+        { state.receive && <Modal asset={ state.asset } handleReceive={ this.handleReceive } /> }
+        { state.send && <Contacts asset={ state.asset } handleSend={ this.handleSend } /> }
       </div>
     );
   }
