@@ -35,6 +35,12 @@ const transfer = {
     amount: "Amount",
     memo: "Memo",
     forward: "Send to others",
+    pay: "Generate & pay",
+    card: {
+      title: "Multisig Payment",
+      description: "From %{body}",
+      icon_url: "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
+    }
   },
 };
 

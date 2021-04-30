@@ -19,6 +19,9 @@ import { ReactComponent as AmountIcon } from '../statics/images/ic_amount.svg';
 class Index extends Component {
   constructor(props) {
     super(props);
+    console.log(props);
+
+    let type =  props.location.pathname.includes('transfer') ? 'transfer' : 'recipient';
 
     this.state = {
       assetId: props.match.params.id,
@@ -27,6 +30,7 @@ class Index extends Component {
       amount: '',
       value: 0,
       memo: '',
+      type: type,
       loading: true,
     };
 
@@ -63,7 +67,27 @@ class Index extends Component {
       },
     }
     ApiPostPayments(params).then((resp) => {
-      console.log(resp);
+      if (resp.error) {
+        return;
+      }
+
+      let text = `https://mixin.one/codes/${resp.data.code_id}`;
+      console.log(text);
+      if (this.state.type === 'transfer') {
+        window.open(text);
+        return;
+      }
+
+      let description = window.i18n.t('transfer.card.description', { body:  this.state.conversation.name });
+
+      let data = `{
+      "action":"${text}",
+      "app_id":"${process.env.REACT_APP_CLIENT_ID}",
+      "description":"${ description.slice(0, 128) }",
+      "icon_url":"https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256",
+      "title":"${ window.i18n.t('transfer.card.title') }",
+    }`
+      window.open("mixin://send?category=app_card&data="+encodeURIComponent(btoa(data)));
     });
   }
 
@@ -117,6 +141,14 @@ class Index extends Component {
       );
     }
 
+    let transfer = (
+      <button onClick={this.handleSubmit} className={`${ styles.submit } ${state.submitting}`}>{i18n.t('transfer.pay')}</button>
+    );
+
+    let recipient = (
+      <button onClick={this.handleSubmit} className={`${ styles.submit } ${state.submitting}`}>{i18n.t('transfer.forward')}</button>
+    );
+
     return (
       <div className={ styles.transfer } style={{ backgroundImage: `url(${ background })` }}>
         <main>
@@ -144,7 +176,8 @@ class Index extends Component {
             <input placeholder={ i18n.t('transfer.memo') } name="memo" value={ state.memo } onChange={ this.handleChange } />
           </div>
           <div className={ styles.action }>
-            <button onClick={this.handleSubmit} className={`${ styles.submit } ${state.submitting}`}>{i18n.t('transfer.forward')}</button>
+            { state.type === 'transfer' && transfer }
+            { state.type === 'recipient' && recipient }
           </div>
         </main>
       </div>

@@ -175,12 +175,12 @@ class Index extends Component {
             ≈ ${ state.asset.value }
           </div>
           <div className={ styles.actions }>
-            <div  onClick={ () => this.handleModal(true)}>
+            <div>
               { i18n.t('asset.action.send') }
             </div>
             <div className={ styles.divide }>
             </div>
-            <div>{ i18n.t('asset.action.receive') }</div>
+            <div onClick={ () => this.handleModal(true)}>{ i18n.t('asset.action.receive') }</div>
           </div>
         </div>
         { state.outputs.length === 0 && blank }
