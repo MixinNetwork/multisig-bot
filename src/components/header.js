@@ -7,7 +7,7 @@ function Header(props) {
   const i18n = window.i18n;
 
   return (
-    <Link className={ styles.header }>
+    <Link to={ props.to } className={ styles.header }>
       <LeftIcon />
       <div>{ i18n.t(props.name) }</div>
     </Link>

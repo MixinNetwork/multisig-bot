@@ -173,7 +173,7 @@ class Index extends Component {
         className={styles.transfer}
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header name={ `transfer.header.${ state.type }` } />
+        <Header to='/' name={ `transfer.header.${ state.type }` } />
         <main>
           <div className={styles.icon}>
             <AssetIcon asset={state.asset} />
