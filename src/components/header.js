@@ -8,7 +8,7 @@ function Header(props) {
 
   return (
     <Link to={ props.to } className={ styles.header }>
-      <LeftIcon />
+      { props.icon !== "disable" && <LeftIcon /> }
       <div>{ i18n.t(props.name) }</div>
     </Link>
   );

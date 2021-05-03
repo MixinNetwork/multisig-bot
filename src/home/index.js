@@ -13,6 +13,7 @@ import {
 import util from "../api/util.js";
 import storage from "../api/storage.js";
 import AssetIcon from "../components/cover.js";
+import Header from "../components/header.js";
 import background from "../statics/images/bg_texture.png";
 import { ReactComponent as SettingIcon } from "../statics/images/ic_setting.svg";
 import Modal from "./modal.js";
@@ -25,6 +26,8 @@ class Index extends Component {
       balanceBTC: 0,
       balanceUSD: 0,
       assets: [],
+      participants_count: 0,
+      threshold: 0,
       modal: false,
       loading: true,
     };
@@ -108,6 +111,8 @@ class Index extends Component {
       balanceBTC: balanceBTC,
       balanceUSD: balanceUSD,
       assets: assets,
+      participants_count: participantIds.length,
+      threshold: util.parseThreshold(conversation.name),
       loading: false,
     });
   }
@@ -202,6 +207,7 @@ class Index extends Component {
         className={styles.home}
         style={{ backgroundImage: `url(${background})` }}
       >
+        <Header icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participants_count}`})} />
         <div className={styles.balance}>
           <div className={styles.btc}>
             {state.balanceBTC} <span>BTC</span>

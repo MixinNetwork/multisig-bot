@@ -4,6 +4,9 @@ const global = {
 
 const home = {
   home: {
+    header: {
+      title: "Multisig Wallet (%{text})",
+    },
     assets: "Assets",
     modal: {
       title: "Assets Management",
@@ -14,6 +17,9 @@ const home = {
 
 const asset = {
   asset: {
+    header: {
+      title: "Asset Info"
+    },
     action: {
       send: "Send",
       receive: "Receive",

@@ -10,6 +10,7 @@ import {
   ApiGetConversation,
 } from "../api";
 import util from "../api/util.js";
+import Header from "../components/header.js";
 import AssetIcon from "../components/cover.js";
 import Loading from "../components/loading.js";
 import Modal from "./modal.js";
@@ -26,7 +27,7 @@ class Index extends Component {
       asset: {},
       outputs: [],
       receive: false,
-      send: true,
+      send: false,
       loading: true,
     };
 
@@ -186,6 +187,7 @@ class Index extends Component {
         className={styles.asset}
         style={{ backgroundImage: `url(${background})` }}
       >
+        <Header to='/' name={ i18n.t('asset.header.title') } />
         <div className={styles.info}>
           <AssetIcon asset={state.asset} />
           <div className={styles.balance}>
