@@ -1,7 +1,7 @@
 class Util {
   parseThreshold(name) {
-    name = name || '';
-    var parts = name.split('^');
+    name = name || "";
+    var parts = name.split("^");
     if (parts.length !== 2) {
       return -1;
     }

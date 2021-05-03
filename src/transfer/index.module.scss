@@ -24,21 +24,21 @@
   }
 
   .group {
-    background: #F5F7FA;
-    border-radius: .8rem;
+    background: #f5f7fa;
+    border-radius: 0.8rem;
     width: 100%;
     margin-bottom: 1rem;
-    padding: .8rem 1.6rem;
+    padding: 0.8rem 1.6rem;
 
     input {
       border: 0;
-      background: #F5F7FA;
+      background: #f5f7fa;
       width: 100%;
     }
   }
 
   .amount {
-    color: #B8BDC7;
+    color: #b8bdc7;
     display: flex;
     align-items: center;
   }
@@ -48,7 +48,7 @@
   }
 
   .value {
-    color: #B8BDC7;
+    color: #b8bdc7;
     font-size: 1.2rem;
   }
 
@@ -61,7 +61,7 @@
   }
 
   .submit {
-    background: #3D404B;
+    background: #3d404b;
     border: 0;
     border-radius: 4.8rem;
     color: white;

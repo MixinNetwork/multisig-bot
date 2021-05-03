@@ -1,35 +1,37 @@
-import styles from './index.module.scss';
-import React, { Component } from 'react';
-import Decimal from 'decimal.js';
-import mixin from 'bot-api-js-client';
-import { v4 as uuidv4 } from 'uuid';
+import styles from "./index.module.scss";
+import React, { Component } from "react";
+import Decimal from "decimal.js";
+import mixin from "bot-api-js-client";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   ApiGetAsset,
   ApiGetChains,
   ApiGetConversation,
   ApiPostPayments,
-} from '../api';
-import util from '../api/util.js';
-import AssetIcon from '../components/cover.js';
-import Loading from '../components/loading.js';
+} from "../api";
+import util from "../api/util.js";
+import AssetIcon from "../components/cover.js";
+import Loading from "../components/loading.js";
 import background from "../statics/images/bg.png";
-import { ReactComponent as AmountIcon } from '../statics/images/ic_amount.svg';
+import { ReactComponent as AmountIcon } from "../statics/images/ic_amount.svg";
 
 class Index extends Component {
   constructor(props) {
     super(props);
     console.log(props);
 
-    let type =  props.location.pathname.includes('transfer') ? 'transfer' : 'recipient';
+    let type = props.location.pathname.includes("transfer")
+      ? "transfer"
+      : "recipient";
 
     this.state = {
       assetId: props.match.params.id,
       conversation: {},
       asset: {},
-      amount: '',
+      amount: "",
       value: 0,
-      memo: '',
+      memo: "",
       type: type,
       loading: true,
     };
@@ -41,18 +43,23 @@ class Index extends Component {
   handleChange(e) {
     const { name, value } = e.target;
     let state = { [name]: value };
-    if (name === 'amount') {
-      let v = (new Decimal((new Decimal(value)).times(this.state.asset.price_usd).toFixed(8))).toFixed();
-      state['value'] = v;
+    if (name === "amount") {
+      let v = new Decimal(
+        new Decimal(value).times(this.state.asset.price_usd).toFixed(8)
+      ).toFixed();
+      state["value"] = v;
     }
     this.setState(state);
   }
 
   handleSubmit() {
     let participantIds = [];
-    this.state.conversation.participants.forEach(p => {
+    this.state.conversation.participants.forEach((p) => {
       // skip current and old multisig bot
-      if (process.env.REACT_APP_CLIENT_ID !== p.user_id && '37e040ec-df91-47a7-982e-0e118932fa8b' !== p.user_id) {
+      if (
+        process.env.REACT_APP_CLIENT_ID !== p.user_id &&
+        "37e040ec-df91-47a7-982e-0e118932fa8b" !== p.user_id
+      ) {
         participantIds.push(p.user_id);
       }
     });
@@ -65,7 +72,7 @@ class Index extends Component {
         receivers: participantIds,
         threshold: util.parseThreshold(this.state.conversation.name),
       },
-    }
+    };
     ApiPostPayments(params).then((resp) => {
       if (resp.error) {
         return;
@@ -73,21 +80,25 @@ class Index extends Component {
 
       let text = `https://mixin.one/codes/${resp.data.code_id}`;
       console.log(text);
-      if (this.state.type === 'transfer') {
+      if (this.state.type === "transfer") {
         window.open(text);
         return;
       }
 
-      let description = window.i18n.t('transfer.card.description', { body:  this.state.conversation.name });
+      let description = window.i18n.t("transfer.card.description", {
+        body: this.state.conversation.name,
+      });
 
       let data = `{
       "action":"${text}",
       "app_id":"${process.env.REACT_APP_CLIENT_ID}",
-      "description":"${ description.slice(0, 128) }",
+      "description":"${description.slice(0, 128)}",
       "icon_url":"https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256",
-      "title":"${ window.i18n.t('transfer.card.title') }",
-    }`
-      window.open("mixin://send?category=app_card&data="+encodeURIComponent(btoa(data)));
+      "title":"${window.i18n.t("transfer.card.title")}",
+    }`;
+      window.open(
+        "mixin://send?category=app_card&data=" + encodeURIComponent(btoa(data))
+      );
     });
   }
 
@@ -136,48 +147,69 @@ class Index extends Component {
     let state = this.state;
 
     if (state.loading) {
-      return (
-        <Loading />
-      );
+      return <Loading />;
     }
 
     let transfer = (
-      <button onClick={this.handleSubmit} className={`${ styles.submit } ${state.submitting}`}>{i18n.t('transfer.pay')}</button>
+      <button
+        onClick={this.handleSubmit}
+        className={`${styles.submit} ${state.submitting}`}
+      >
+        {i18n.t("transfer.pay")}
+      </button>
     );
 
     let recipient = (
-      <button onClick={this.handleSubmit} className={`${ styles.submit } ${state.submitting}`}>{i18n.t('transfer.forward')}</button>
+      <button
+        onClick={this.handleSubmit}
+        className={`${styles.submit} ${state.submitting}`}
+      >
+        {i18n.t("transfer.forward")}
+      </button>
     );
 
     return (
-      <div className={ styles.transfer } style={{ backgroundImage: `url(${ background })` }}>
+      <div
+        className={styles.transfer}
+        style={{ backgroundImage: `url(${background})` }}
+      >
         <main>
-          <div className={ styles.icon }>
-            <AssetIcon asset={ state.asset } />
+          <div className={styles.icon}>
+            <AssetIcon asset={state.asset} />
           </div>
-          <div className={ styles.group }>
-            { state.asset.symbol }
-            <div className={ styles.value }>
-              { state.asset.balance }
+          <div className={styles.group}>
+            {state.asset.symbol}
+            <div className={styles.value}>
+              {state.asset.balance}
               &nbsp;
-              { i18n.t('transfer.balance') }
+              {i18n.t("transfer.balance")}
             </div>
           </div>
-          <div className={ `${styles.group} ${styles.amount}` }>
-            <div className={ styles.body }>
-              <input placeholder={ i18n.t('transfer.amount') } type="number" name="amount" min="0" value={ state.amount } onChange={ this.handleChange } />
-              <div className={ styles.value }>
-                { state.value } USD
-              </div>
+          <div className={`${styles.group} ${styles.amount}`}>
+            <div className={styles.body}>
+              <input
+                placeholder={i18n.t("transfer.amount")}
+                type="number"
+                name="amount"
+                min="0"
+                value={state.amount}
+                onChange={this.handleChange}
+              />
+              <div className={styles.value}>{state.value} USD</div>
             </div>
             <AmountIcon />
           </div>
-          <div className={ `${styles.group} ${styles.memo}` }>
-            <input placeholder={ i18n.t('transfer.memo') } name="memo" value={ state.memo } onChange={ this.handleChange } />
+          <div className={`${styles.group} ${styles.memo}`}>
+            <input
+              placeholder={i18n.t("transfer.memo")}
+              name="memo"
+              value={state.memo}
+              onChange={this.handleChange}
+            />
           </div>
-          <div className={ styles.action }>
-            { state.type === 'transfer' && transfer }
-            { state.type === 'recipient' && recipient }
+          <div className={styles.action}>
+            {state.type === "transfer" && transfer}
+            {state.type === "recipient" && recipient}
           </div>
         </main>
       </div>

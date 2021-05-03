@@ -18,12 +18,12 @@
   align-items: center;
 }
 .icon {
-  margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 .balance {
   font-size: 3.2rem;
   font-weight: 600;
-  margin: .6rem 0;
+  margin: 0.6rem 0;
   span {
     font-size: 1.6rem;
     font-weight: normal;
@@ -31,13 +31,13 @@
 }
 .value {
   font-size: 1.4rem;
-  color: #B8BDC7;
+  color: #b8bdc7;
   margin-bottom: 1.6rem;
 }
 .actions {
-  background: #F5F7FA;
+  background: #f5f7fa;
   border-radius: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
   padding: 1.4rem 0 1.5rem;
   display: flex;
   justify-content: space-evenly;
@@ -51,7 +51,7 @@
   background: white;
   border-radius: 1.6rem;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  color: #B8BDC7;
+  color: #b8bdc7;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -73,7 +73,7 @@
     font-size: 1.4rem;
   }
   .hint {
-    color: #B8BDC7;
+    color: #b8bdc7;
     font-size: 1.4rem;
     margin-bottom: 2rem;
   }
@@ -91,7 +91,7 @@
     padding-right: 1.6rem;
   }
   .amount {
-    padding: 0 .5rem 0 2rem;
+    padding: 0 0.5rem 0 2rem;
   }
   .symbol {
     font-size: 1.4rem;

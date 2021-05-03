@@ -28,14 +28,14 @@
   }
 
   .search {
-    background: #F5F7FA;
+    background: #f5f7fa;
     border-radius: 2rem;
     margin-bottom: 1.6rem;
     padding: 1.2rem 1.6rem;
     display: flex;
     align-items: center;
     input {
-      background: #F5F7FA;
+      background: #f5f7fa;
       border: none;
       font-size: 1.6rem;
       padding: 0 1.2rem;
@@ -50,6 +50,7 @@
 
   .item {
     display: flex;
+    align-items: center;
     padding: 1.2rem 0;
   }
 
@@ -59,8 +60,8 @@
 
   .id {
     font-size: 1.4rem;
-    color: #B8BDC7;
-    margin-top: .4rem;
+    color: #b8bdc7;
+    margin-top: 0.4rem;
   }
 
   .avatar {
