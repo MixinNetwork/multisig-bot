@@ -11,6 +11,7 @@ import {
   ApiPostPayments,
 } from "../api";
 import util from "../api/util.js";
+import Header from "../components/header.js";
 import AssetIcon from "../components/cover.js";
 import Loading from "../components/loading.js";
 import background from "../statics/images/bg.png";
@@ -19,9 +20,8 @@ import { ReactComponent as AmountIcon } from "../statics/images/ic_amount.svg";
 class Index extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
 
-    let type = props.location.pathname.includes("transfer")
+    const type = props.location.pathname.includes("transfer")
       ? "transfer"
       : "recipient";
 
@@ -173,6 +173,7 @@ class Index extends Component {
         className={styles.transfer}
         style={{ backgroundImage: `url(${background})` }}
       >
+        <Header name={ `transfer.header.${ state.type }` } />
         <main>
           <div className={styles.icon}>
             <AssetIcon asset={state.asset} />

@@ -35,6 +35,10 @@ const asset = {
 
 const transfer = {
   transfer: {
+    header: {
+      recipient: "Create Recipient Card",
+      transfer: "Transfer from Wallet",
+    },
     balance: "BALANCE",
     amount: "Amount",
     memo: "Memo",

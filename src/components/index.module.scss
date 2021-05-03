@@ -27,3 +27,14 @@
     z-index: 99;
   }
 }
+
+.header {
+  color: white;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  margin: .8rem 0 3rem;
+  svg {
+    margin-right: 1.6rem;
+  }
+}
