@@ -44,8 +44,9 @@ class Index extends Component {
     const { name, value } = e.target;
     let state = { [name]: value };
     if (name === "amount") {
+      let val = value || "0";
       let v = new Decimal(
-        new Decimal(value).times(this.state.asset.price_usd).toFixed(8)
+        new Decimal(val).times(this.state.asset.price_usd).toFixed(8)
       ).toFixed();
       state["value"] = v;
     }
@@ -149,11 +150,12 @@ class Index extends Component {
     if (state.loading) {
       return <Loading />;
     }
+    let amount = state.amount !== "" && (new Decimal(state.amount)).gt(new Decimal("0"));
 
     let transfer = (
       <button
         onClick={this.handleSubmit}
-        className={`${styles.submit} ${state.submitting}`}
+        className={`submit ${ amount } ${state.submitting}`}
       >
         {i18n.t("transfer.pay")}
       </button>
@@ -162,7 +164,7 @@ class Index extends Component {
     let recipient = (
       <button
         onClick={this.handleSubmit}
-        className={`${styles.submit} ${state.submitting}`}
+        className={`submit ${ amount } ${state.submitting}`}
       >
         {i18n.t("transfer.forward")}
       </button>
