@@ -17,6 +17,11 @@ import Loading from "../components/loading.js";
 import background from "../statics/images/bg.png";
 import { ReactComponent as AmountIcon } from "../statics/images/ic_amount.svg";
 
+/*
+ * Transfer in from wallet
+ * Pay by others
+ * Withdrawal to friend
+ */
 class Index extends Component {
   constructor(props) {
     super(props);

@@ -207,7 +207,7 @@ class Index extends Component {
         className={styles.home}
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participants_count}`})} />
+        <Header to="/" icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participants_count}`})} />
         <div className={styles.balance}>
           <div className={styles.btc}>
             {state.balanceBTC} <span>BTC</span>
