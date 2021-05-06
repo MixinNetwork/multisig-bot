@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 0 2.4rem 20rem;
+  padding: 0 1rem 20rem;
 
   main {
     flex-grow: 1;
@@ -10,6 +10,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 0 1.4rem;
   }
 
   .icon {
