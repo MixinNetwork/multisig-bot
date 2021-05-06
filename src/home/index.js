@@ -14,9 +14,11 @@ import util from "../api/util.js";
 import storage from "../api/storage.js";
 import AssetIcon from "../components/cover.js";
 import Header from "../components/header.js";
+import Loading from "../components/loading.js";
 import background from "../statics/images/bg_texture.png";
 import { ReactComponent as SettingIcon } from "../statics/images/ic_setting.svg";
 import Modal from "./modal.js";
+
 
 class Index extends Component {
   constructor(props) {
@@ -131,7 +133,7 @@ class Index extends Component {
       participants,
       threshold,
       "unspent",
-      threshold
+      offset,
     );
     if (outputs.data) {
       utxo.push(...outputs.data);
@@ -177,6 +179,10 @@ class Index extends Component {
   render() {
     const i18n = window.i18n;
     let state = this.state;
+
+    if (state.loading) {
+      return <Loading />;
+    }
 
     let assets = state.assets.map((asset) => {
       return (

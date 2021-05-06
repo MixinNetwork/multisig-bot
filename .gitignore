@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+src/utils/common/common.js
+src/utils/common/common.js.map
