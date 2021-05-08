@@ -5,6 +5,7 @@ import {
   ApiGetAsset,
   ApiGetChains,
   ApiPostUsersFetch,
+  ApiPostMultisigsRequests,
 } from "../api";
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
@@ -51,7 +52,16 @@ class Show extends Component {
     return this.loadUsers(members);
   }
 
+  async postMultisigsRequest() {
+    let request = await ApiPostMultisigsRequests("sign", this.state.utxo.signed_tx);
+    if (!request.error) {
+      return request.data;
+    }
+    return this.postMultisigsRequest();
+  }
+
   async loadFullData() {
+    let utxo = this.state.utxo;
     let chains = await this.loadChains();
     let asset = await this.loadAsset();
     asset.chain = chains[asset.chain_id];
@@ -61,12 +71,19 @@ class Show extends Component {
     let memberIds = [...this.state.utxo.members];
     memberIds.push(this.state.utxo.user_id);
     memberIds.push(this.state.utxo.sender);
+    if (this.state.utxo.state === "signed") {
+      let request = await this.postMultisigsRequest();
+      utxo.signers = request.signers;
+      utxo.receivers = request.receivers;
+      memberIds.push(...request.signers);
+      memberIds.push(...request.receivers);
+    }
     let users = await this.loadUsers(memberIds);
     let usersMap = {};
     for (let i in users) {
       usersMap[users[i].user_id] = users[i];
     }
-    this.setState({ asset: asset, users: usersMap, loading: false });
+    this.setState({ utxo: utxo, asset: asset, users: usersMap, loading: false });
   }
 
   componentDidMount() {
@@ -90,6 +107,26 @@ class Show extends Component {
     }
 
     let members = state.utxo.members.map((m) => {
+      let user = state.users[m];
+      if (!user) {
+        return "";
+      }
+      return (
+        <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+      );
+    });
+
+    let signers = state.utxo.signers.map((m) => {
+      let user = state.users[m];
+      if (!user) {
+        return "";
+      }
+      return (
+        <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+      );
+    });
+
+    let receivers = state.utxo.receivers.map((m) => {
       let user = state.users[m];
       if (!user) {
         return "";
@@ -145,12 +182,26 @@ class Show extends Component {
             </div>
             { members }
           </div>
-          <div className={ styles.group }>
-            <div className={ styles.title }>
-              { i18n.t("transfer.detail.signers") }
-            </div>
-            { state.utxo.utxo_id }
-          </div>
+          {
+            state.utxo.state === "signed" && (
+              <div className={ styles.group }>
+                <div className={ styles.title }>
+                  { i18n.t("transfer.detail.receivers") }
+                </div>
+                { receivers }
+              </div>
+            )
+          }
+          {
+            state.utxo.state === "signed" && (
+              <div className={ styles.group }>
+                <div className={ styles.title }>
+                  { i18n.t("transfer.detail.signers") }
+                </div>
+                { signers }
+              </div>
+            )
+          }
           <div className={ styles.group }>
             <div className={ styles.title }>
               { i18n.t("transfer.detail.memo") }

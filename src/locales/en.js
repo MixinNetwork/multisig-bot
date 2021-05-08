@@ -66,6 +66,7 @@ const transfer = {
       state: "UTXO state",
       threshold: "Threshold",
       members: "Members",
+      receivers: "Receivers",
       signers: "Signers",
       memo: "Memo",
       time: "Updated At",
