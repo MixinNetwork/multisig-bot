@@ -19,6 +19,7 @@ export default function App() {
         <Route exact path="/assets/:id/transfer" component={ Transfer.Index } />
         <Route exact path="/assets/:id/recipient" component={ Transfer.Index } />
         <Route exact path="/assets/:id/withdrawal/:user_id" component={ Transfer.Withdrawal } />
+        <Route exact path="/transfer" component={ Transfer.Show } />
         <Route exact path="/guide" component={ Guide.Index } />
       </Switch>
     </Router>

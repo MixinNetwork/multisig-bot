@@ -46,6 +46,7 @@ const transfer = {
       recipient: "Create Recipient Card",
       transfer: "Transfer from Wallet",
       withdrawal: "Withdrawal to %{name}",
+      show: "Transaction",
     },
     balance: "BALANCE",
     amount: "Amount",
@@ -58,6 +59,16 @@ const transfer = {
       description: "From %{body}",
       icon_url:
       "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
+    },
+    detail: {
+      transaction_id: "Transaction ID",
+      asset_type: "Asset Type",
+      state: "UTXO state",
+      threshold: "Threshold",
+      members: "Members",
+      signers: "Signers",
+      memo: "Memo",
+      time: "Updated At",
     },
   },
 };

@@ -2,7 +2,6 @@ import styles from "./index.module.scss";
 import React, { Component } from "react";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   ApiGetAsset,

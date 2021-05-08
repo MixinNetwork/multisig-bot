@@ -2,6 +2,7 @@ import styles from "./index.module.scss";
 import React, { Component } from "react";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
+import { Link } from "react-router-dom";
 
 import {
   ApiGetAsset,
@@ -111,8 +112,8 @@ class Index extends Component {
     );
     let balance = outputs.reduce((a, c) => {
       if (c.asset_id === that.state.assetId) {
-        if (transactions.length < 50) {
-          transactions.push(c); // Only list latest 50 transactions
+        if (transactions.length < 500) {
+          transactions.push(c); // Only list latest 500 transactions
         }
         if (c.state === "unspent") {
           return a.plus(c.amount);
@@ -172,17 +173,19 @@ class Index extends Component {
               }/${created.getDate()}/${created.getFullYear()}`}
             </div>
           )}
-          <div className={`${styles.item} ${styles[o.state]}`}>
-            <div className={styles.memo }>
-              <div>{o.memo || i18n.t("asset.memo")}</div>
-              { o.state === "signed" && <div className={ styles.state }>{ i18n.t("asset.signed") }</div> }
+          <Link to={{ pathname: "/transfer", utxo: o }} >
+            <div className={`${styles.item} ${styles[o.state]}`}>
+              <div className={styles.memo }>
+                <div>{o.memo || i18n.t("asset.memo")}</div>
+                { o.state === "signed" && <div className={ styles.state }>{ i18n.t("asset.signed") }</div> }
+              </div>
+              <div className={ `${styles.amount} ${ style }`} >
+                { o.state === "unspent" ? "+" : "-" }
+                { o.amount }
+              </div>
+              <div className={styles.symbol}>{state.asset.symbol}</div>
             </div>
-            <div className={ `${styles.amount} ${ style }`} >
-              { o.state === "unspent" ? "+" : "-" }
-              { o.amount }
-            </div>
-            <div className={styles.symbol}>{state.asset.symbol}</div>
-          </div>
+          </Link>
         </li>
       );
     });
