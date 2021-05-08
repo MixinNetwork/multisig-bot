@@ -61,7 +61,7 @@ button.submit {
   color: white;
   padding: 1.4rem 3.8rem;
 
-  &.false {
+  &.false, &.prepare {
     background: rgba(61, 64, 75, 0.16);
   }
 }

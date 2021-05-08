@@ -110,11 +110,13 @@ class Index extends Component {
       []
     );
     let balance = outputs.reduce((a, c) => {
-      if (c.asset_id === that.state.assetId && c.state === "unspent") {
+      if (c.asset_id === that.state.assetId) {
         if (transactions.length < 50) {
-          transactions.push(c); // Only list lastest 50 transactions
+          transactions.push(c); // Only list latest 50 transactions
         }
-        return a.plus(c.amount);
+        if (c.state === "unspent") {
+          return a.plus(c.amount);
+        }
       }
       return a;
     }, new Decimal("0"));
@@ -148,9 +150,18 @@ class Index extends Component {
     );
 
     let hint = 100;
-    let transactionList = state.outputs.map((o) => {
-      let created = new Date(o.created_at);
+    let transactionList = state.outputs.sort((a, b) => {
+      if ((new Date(a.updated_at)) > (new Date(b.updated_at))) {
+        return -1;
+      }
+      if ((new Date(a.updated_at)) < (new Date(b.updated_at))) {
+        return 1;
+      }
+      return 0;
+    }).map((o) => {
+      let created = new Date(o.updated_at);
       let divide = hint !== created.getDate();
+      let style = o.state === "unspent" ? "green" : "red";
       hint = created.getDate();
       return (
         <li key={o.utxo_id}>
@@ -161,13 +172,14 @@ class Index extends Component {
               }/${created.getDate()}/${created.getFullYear()}`}
             </div>
           )}
-          <div className={styles.item}>
-            <div className={styles.memo}>{o.Memo || i18n.t("asset.memo")}</div>
-            <div
-              className={styles.amount + ` ${o.amount >= 0 ? "green" : "red"}`}
-            >
-              {o.amount >= 0 ? "+" : "-"}
-              {o.amount}
+          <div className={`${styles.item} ${styles[o.state]}`}>
+            <div className={styles.memo }>
+              <div>{o.memo || i18n.t("asset.memo")}</div>
+              { o.state === "signed" && <div className={ styles.state }>{ i18n.t("asset.signed") }</div> }
+            </div>
+            <div className={ `${styles.amount} ${ style }`} >
+              { o.state === "unspent" ? "+" : "-" }
+              { o.amount }
             </div>
             <div className={styles.symbol}>{state.asset.symbol}</div>
           </div>

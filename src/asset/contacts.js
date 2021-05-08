@@ -1,5 +1,6 @@
 import styles from "./contacts.module.scss";
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import { ApiGetFriends } from "../api";
 import { ReactComponent as CloseIcon } from "../statics/images/ic_close.svg";
@@ -59,12 +60,14 @@ function Contacts(props) {
         <div className={styles.avatar}> {contact.full_name.slice(0, 1)} </div>
       );
     return (
-      <li className={styles.item} key={contact.user_id}>
-        {avatar}
-        <div className={styles.info}>
-          {contact.full_name}
-          <div className={styles.id}>{contact.identity_number}</div>
-        </div>
+      <li key={contact.user_id}>
+        <Link className={styles.item} to={`/assets/${props.asset.asset_id}/withdrawal/${contact.user_id}`}>
+          {avatar}
+          <div className={styles.info}>
+            {contact.full_name}
+            <div className={styles.id}>{contact.identity_number}</div>
+          </div>
+        </Link>
       </li>
     );
   });

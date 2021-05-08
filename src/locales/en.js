@@ -27,6 +27,7 @@ const asset = {
     blank: "NO TRANSACTION",
     memo: "TRANSACTION",
     transactions: "Transactions",
+    signed: "Transaction is processing",
     modal: {
       title: "Send To",
       wallet: "Transfer from wallet",
@@ -44,17 +45,19 @@ const transfer = {
     header: {
       recipient: "Create Recipient Card",
       transfer: "Transfer from Wallet",
+      withdrawal: "Withdrawal to %{name}",
     },
     balance: "BALANCE",
     amount: "Amount",
     memo: "Memo",
     forward: "Send to others",
     pay: "Generate & pay",
+    withdrawal: "Withdrawal",
     card: {
       title: "Multisig Payment",
       description: "From %{body}",
       icon_url:
-        "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
+      "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
     },
   },
 };

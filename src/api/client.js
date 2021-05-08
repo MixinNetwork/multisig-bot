@@ -14,7 +14,13 @@ class Client {
       path,
       data,
       callback
-    );
+    ).then((resp) => {
+      if (callback) {
+        callback(resp.data)
+      } else {
+        return resp.data
+      }
+    });
   }
 
   requestByToken(method, path, data, accessToken, callback) {
@@ -33,7 +39,7 @@ class Client {
               case 401:
                 window.location.replace(
                   `https://mixin.one/oauth/authorize?client_id=${clientId}&scope=PROFILE:READ+ASSETS:READ+CONTACTS:READ&response_type=code&code_challenge=` +
-                    mixin.util.challenge()
+                  mixin.util.challenge()
                 );
                 break;
               default:
@@ -43,6 +49,12 @@ class Client {
         }
 
         return resp;
+      }).then((resp) => {
+        if (callback) {
+          callback(resp.data)
+        } else {
+          return resp.data
+        }
       });
   }
 }

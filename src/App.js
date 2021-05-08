@@ -13,12 +13,13 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/" component={Home.Index} />
-        <Route exact path="/auth" component={Auth.Index} />
-        <Route exact path="/assets/:id" component={Asset.Index} />
-        <Route exact path="/assets/:id/transfer" component={Transfer.Index} />
-        <Route exact path="/assets/:id/recipient" component={Transfer.Index} />
-        <Route exact path="/guide" component={Guide.Index} />
+        <Route exact path="/" component={ Home.Index } />
+        <Route exact path="/auth" component={ Auth.Index } />
+        <Route exact path="/assets/:id" component={ Asset.Index } />
+        <Route exact path="/assets/:id/transfer" component={ Transfer.Index } />
+        <Route exact path="/assets/:id/recipient" component={ Transfer.Index } />
+        <Route exact path="/assets/:id/withdrawal/:user_id" component={ Transfer.Withdrawal } />
+        <Route exact path="/guide" component={ Guide.Index } />
       </Switch>
     </Router>
   );

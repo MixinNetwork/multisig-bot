@@ -20,7 +20,6 @@ import { ReactComponent as AmountIcon } from "../statics/images/ic_amount.svg";
 /*
  * Transfer in from wallet
  * Pay by others
- * Withdrawal to friend
  */
 class Index extends Component {
   constructor(props) {
@@ -155,12 +154,12 @@ class Index extends Component {
     if (state.loading) {
       return <Loading />;
     }
-    let amount = state.amount !== "" && (new Decimal(state.amount)).gt(new Decimal("0"));
 
+    let ready = state.amount !== "" && (new Decimal(state.amount)).gt(new Decimal("0"));
     let transfer = (
       <button
         onClick={this.handleSubmit}
-        className={`submit ${ amount } ${state.submitting}`}
+        className={`submit ${ ready } ${state.submitting}`}
       >
         {i18n.t("transfer.pay")}
       </button>
@@ -169,7 +168,7 @@ class Index extends Component {
     let recipient = (
       <button
         onClick={this.handleSubmit}
-        className={`submit ${ amount } ${state.submitting}`}
+        className={`submit ${ ready } ${state.submitting}`}
       >
         {i18n.t("transfer.forward")}
       </button>
@@ -180,7 +179,7 @@ class Index extends Component {
         className={styles.transfer}
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header to='/' name={ `transfer.header.${ state.type }` } />
+        <Header to='/' name={ i18n.t(`transfer.header.${ state.type }`) } />
         <main>
           <div className={styles.icon}>
             <AssetIcon asset={state.asset} />

@@ -52,7 +52,30 @@ export const ApiGetMultisigsOutputs = (ids, threshold, state, offset) => {
     storage.getToken()
   );
 };
-
+export const ApiPostMultisigsRequests = (action, raw) => {
+  let params = {
+    action: action,
+    raw: raw,
+  };
+  return client.requestByToken(
+    "POST",
+    "/multisigs/requests",
+    params,
+    storage.getToken(),
+  );
+};
+export const ApiPostGhostKeys = (ids, index) => {
+  let params = {
+    receivers: ids,
+    index: index,
+  };
+  return client.requestByToken(
+    "POST",
+    "/outputs",
+    params,
+    storage.getToken(),
+  );
+};
 export const ApiGetConversation = (id) => {
   if (process.env.environment !== "production") {
     id = "64997435-0115-4087-ad1c-6c346815338d";
@@ -95,4 +118,8 @@ export const ApiPostAuthenticate = (code) => {
 
 export const ApiPostPayments = (params) => {
   return client.requestByToken("POST", "/payments", params, storage.getToken());
+};
+
+export const ApiPostUsersFetch = (ids) => {
+  return client.requestByToken("POST", "/users/fetch", ids, storage.getToken());
 };

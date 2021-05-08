@@ -71,6 +71,7 @@
   padding: 2rem 1.6rem;
   header {
     font-size: 1.4rem;
+    margin-bottom: 2rem;
   }
   .hint {
     color: #b8bdc7;
@@ -81,19 +82,26 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    align-items: center;
+    align-items: start;
     overflow: hidden;
     margin-bottom: 2.8rem;
+    &.signed {
+      color: #B8BDC7;
+    }
   }
   .memo {
     flex-grow: 1;
     overflow: hidden;
     padding-right: 1.6rem;
+    .state {
+      font-size: 1.4rem;
+    }
   }
   .amount {
     padding: 0 0.5rem 0 2rem;
   }
   .symbol {
+    color: #333;
     font-size: 1.4rem;
   }
 }
