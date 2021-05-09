@@ -123,3 +123,8 @@ export const ApiPostPayments = (params) => {
 export const ApiPostUsersFetch = (ids) => {
   return client.requestByToken("POST", "/users/fetch", ids, storage.getToken());
 };
+
+export const ApiPostExternalProxy = (raw) => {
+  let params = { method: "sendrawtransaction", params: [raw] };
+  return client.requestByToken("POST", "/external/proxy", params, storage.getToken());
+};

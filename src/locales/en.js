@@ -70,6 +70,7 @@ const transfer = {
       signers: "Signers",
       memo: "Memo",
       time: "Updated At",
+      send: "Submit the Transaction",
     },
   },
 };

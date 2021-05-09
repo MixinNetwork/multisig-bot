@@ -6,6 +6,7 @@ import {
   ApiGetChains,
   ApiPostUsersFetch,
   ApiPostMultisigsRequests,
+  ApiPostExternalProxy,
 } from "../api";
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
@@ -86,6 +87,17 @@ class Show extends Component {
     this.setState({ utxo: utxo, asset: asset, users: usersMap, loading: false });
   }
 
+  sendRawTransaction = () => {
+    ApiPostExternalProxy(this.state.utxo.signed_tx).then((resp) => {
+      if (resp.error) {
+        return;
+      }
+      let utxo = this.state.utxo;
+      utxo.state = "spent";
+      this.setState({ utxo: utxo });
+    });
+  }
+
   componentDidMount() {
     if (!!this.state.utxo) {
       this.loadFullData();
@@ -116,25 +128,37 @@ class Show extends Component {
       );
     });
 
-    let signers = state.utxo.signers.map((m) => {
-      let user = state.users[m];
-      if (!user) {
-        return "";
-      }
-      return (
-        <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
-      );
-    });
+    let signers;
+    if (state.utxo.signers && state.utxo.signers.length > 0) {
+      signers = state.utxo.signers.map((m) => {
+        let user = state.users[m];
+        if (!user) {
+          return "";
+        }
+        return (
+          <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+        );
+      });
+    }
 
-    let receivers = state.utxo.receivers.map((m) => {
-      let user = state.users[m];
-      if (!user) {
-        return "";
-      }
-      return (
-        <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
-      );
-    });
+    let receivers;
+    if (state.utxo.receivers && state.utxo.receivers.length > 0) {
+      receivers = state.utxo.receivers.map((m) => {
+        let user = state.users[m];
+        if (!user) {
+          return "";
+        }
+        return (
+          <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+        );
+      });
+    }
+
+    let sendRawTransactionButton = (
+      <button onClick={ this.sendRawTransaction } className={ `submit` }>
+        { i18n.t("transfer.detail.send") }
+      </button>
+    );
 
     return (
       <div className={ styles.show }
@@ -213,6 +237,9 @@ class Show extends Component {
               { i18n.t("transfer.detail.time") }
             </div>
             { state.utxo.updated_at }
+          </div>
+          <div className={ styles.action }>
+            { state.utxo.state === "signed" && state.utxo.signers.length >= state.utxo.threshold && sendRawTransactionButton }
           </div>
         </div>
       </div>
