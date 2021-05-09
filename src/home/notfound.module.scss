@@ -1,0 +1,19 @@
+.container {
+  color: #B8BDC7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5rem 16rem;
+}
+.h3 {
+  font-size: 1.8rem;
+  margin-top: 3.2rem;
+}
+.h4 {
+  font-size: 1.4rem;
+  font-weight: normal;
+  margin-top: 1.6rem;
+  text-align: center;
+}

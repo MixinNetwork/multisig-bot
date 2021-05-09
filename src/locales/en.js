@@ -12,6 +12,10 @@ const home = {
       title: "Assets Management",
       search_placeholder: "Name, Symbol",
     },
+    notfound: {
+      h1: "Page not found",
+      h2: "The page you are looking for doesn’t exist or has been moved.",
+    }
   },
 };
 
