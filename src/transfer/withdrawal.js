@@ -1,5 +1,6 @@
 import styles from "./index.module.scss";
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
 
@@ -11,6 +12,7 @@ import {
   ApiPostUsersFetch,
   ApiPostGhostKeys,
   ApiPostMultisigsRequests,
+  ApiGetCode,
 } from "../api";
 import util from "../api/util.js";
 import Header from "../components/header.js";
@@ -35,6 +37,7 @@ class Withdrawal extends Component {
       memo: "",
       loading: true,
       submit: "prepare", // prepare, ready, submitting
+      home: false,
     };
   }
 
@@ -140,8 +143,22 @@ class Withdrawal extends Component {
       }
       let text = `https://mixin.one/codes/${resp.data.code_id}`;
       console.log(text);
-      window.location.replace('mixin://codes/' + resp.data.code_id);
+      window.open('mixin://codes/' + resp.data.code_id);
+      this.loadCode(resp.data.code_id);
     });
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async loadCode(codeId) {
+    let code = await ApiGetCode(codeId);
+    if (code.data && code.data.state === "signed") {
+      this.setState({ home: true });
+    }
+    await this.sleep(1000);
+    return this.loadCode(codeId);
   }
 
   async loadGhostKeys(ids, index) {
@@ -183,7 +200,7 @@ class Withdrawal extends Component {
     let outputs = await ApiGetMultisigsOutputs(
       participants,
       threshold,
-      "",
+      "unspent",
       offset,
     );
     if (outputs.data) {
@@ -225,7 +242,6 @@ class Withdrawal extends Component {
       "",
       []
     );
-    console.log(outputs);
     let balance = outputs.reduce((a, c) => {
       if (c.asset_id === that.state.assetId && c.state === "unspent") {
         return a.plus(c.amount);
@@ -259,6 +275,10 @@ class Withdrawal extends Component {
 
     if (state.loading) {
       return <Loading />;
+    }
+
+    if (state.home) {
+      return <Redirect to="/" />;
     }
 
     return (

@@ -48,6 +48,12 @@ const transfer = {
       withdrawal: "Withdrawal to %{name}",
       show: "Transaction",
     },
+    default: {
+      memo: {
+        transfer: "From Wallet",
+        recipient: "From Recipient",
+      }
+    },
     balance: "BALANCE",
     amount: "Amount",
     memo: "Memo",

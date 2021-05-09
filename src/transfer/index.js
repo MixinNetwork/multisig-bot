@@ -79,6 +79,9 @@ class Index extends Component {
         threshold: util.parseThreshold(this.state.conversation.name),
       },
     };
+    if (params.memo.trim().length === 0) {
+      params.memo = this.state.type === "transfer" ? window.i18n.t("transfer.default.memo.transfer") : window.i18n.t("transfer.default.memo.recipient");
+    }
     ApiPostPayments(params).then((resp) => {
       if (resp.error) {
         return;
