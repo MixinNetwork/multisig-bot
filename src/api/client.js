@@ -27,6 +27,9 @@ class Client {
     return mixin.client
       .requestByToken(method, path, data, accessToken, callback)
       .then((resp) => {
+        return resp.data
+      })
+      .then((resp) => {
         let consumed = false;
         if (typeof callback === "function") {
           consumed = callback(resp);
@@ -49,12 +52,6 @@ class Client {
         }
 
         return resp;
-      }).then((resp) => {
-        if (callback) {
-          callback(resp.data)
-        } else {
-          return resp.data
-        }
       });
   }
 }

@@ -1,14 +1,17 @@
 import styles from "./index.module.scss";
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
 import { v4 as uuidv4 } from "uuid";
+import {Base64} from 'js-base64';
 
 import {
   ApiGetAsset,
   ApiGetChains,
   ApiGetConversation,
   ApiPostPayments,
+  ApiGetCode,
 } from "../api";
 import util from "../api/util.js";
 import Header from "../components/header.js";
@@ -38,13 +41,11 @@ class Index extends Component {
       memo: "",
       type: type,
       loading: true,
+      home: false,
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(e) {
+  handleChange = (e) => {
     const { name, value } = e.target;
     let state = { [name]: value };
     if (name === "amount") {
@@ -57,7 +58,7 @@ class Index extends Component {
     this.setState(state);
   }
 
-  handleSubmit() {
+  handleSubmit = () => {
     let participantIds = [];
     this.state.conversation.participants.forEach((p) => {
       // skip current and old multisig bot
@@ -72,7 +73,7 @@ class Index extends Component {
       asset_id: this.state.asset.asset_id,
       amount: this.state.amount,
       trace_id: uuidv4(),
-      memo: this.state.memo,
+      memo: this.state.memo || "",
       opponent_multisig: {
         receivers: participantIds,
         threshold: util.parseThreshold(this.state.conversation.name),
@@ -87,6 +88,7 @@ class Index extends Component {
       console.log(text);
       if (this.state.type === "transfer") {
         window.open(text);
+        this.loadCode(resp.data.code_id);
         return;
       }
 
@@ -102,9 +104,23 @@ class Index extends Component {
       "title":"${window.i18n.t("transfer.card.title")}",
     }`;
       window.open(
-        "mixin://send?category=app_card&data=" + encodeURIComponent(btoa(data))
+        "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
       );
+      this.setState({ home: true });
     });
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async loadCode(codeId) {
+    let code = await ApiGetCode(codeId);
+    if (code.data && code.data.status === "paid") {
+      this.setState({ home: true });
+    }
+    await this.sleep(1000);
+    return this.loadCode(codeId);
   }
 
   async loadAsset() {
@@ -153,6 +169,10 @@ class Index extends Component {
 
     if (state.loading) {
       return <Loading />;
+    }
+
+    if (state.home) {
+      return <Redirect to="/" />;
     }
 
     let ready = state.amount !== "" && (new Decimal(state.amount)).gt(new Decimal("0"));

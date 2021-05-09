@@ -8,8 +8,10 @@ function Index() {
   const [state, setState] = useState({ loading: true });
   const searchParams = new URLSearchParams(useLocation().search);
 
-  ApiPostAuthenticate(searchParams.get("code")).then(() => {
-    setState({ loading: false });
+  ApiPostAuthenticate(searchParams.get("code")).then((resp) => {
+    if (!resp.error) {
+      setState({ loading: false });
+    }
   });
 
   if (state.loading) {

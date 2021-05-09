@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
     "bot-api-js-client": "/Users/li/Javascript/bot-api-js-client",
+    "js-base64": "^3.6.0",
     "node-polyglot": "^2.4.0",
     "node-sass": "^5.0.0",
     "react": "^17.0.2",

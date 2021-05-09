@@ -78,7 +78,7 @@ export const ApiPostGhostKeys = (ids, index) => {
 };
 export const ApiGetConversation = (id) => {
   if (process.env.environment !== "production") {
-    id = "64997435-0115-4087-ad1c-6c346815338d";
+    id = process.env.REACT_APP_CONVERSATION_ID;
   }
   return client.requestByToken(
     "GET",
@@ -95,6 +95,7 @@ export const ApiPostAuthenticate = (code) => {
     code: code,
     code_verifier: storage.getVerifier(),
   };
+  console.log(params);
 
   return client
     .requestByToken("POST", "/oauth/token", params, "")
@@ -127,4 +128,8 @@ export const ApiPostUsersFetch = (ids) => {
 export const ApiPostExternalProxy = (raw) => {
   let params = { method: "sendrawtransaction", params: [raw] };
   return client.requestByToken("POST", "/external/proxy", params, storage.getToken());
+};
+
+export const ApiGetCode = (id) => {
+  return client.requestByToken("GET", `/codes/${id}`, "", storage.getToken());
 };
