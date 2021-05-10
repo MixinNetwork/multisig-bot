@@ -2,7 +2,7 @@ import styles from "./index.module.scss"; // styles is create-react-app
 import React, { Component } from "react";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import {
   ApiGetChains,
@@ -43,10 +43,6 @@ class Index extends Component {
   }
 
   async loadFullData() {
-    if (!mixin.util.conversationId()) {
-      this.setState({ guide: true });
-      return
-    }
     let conversation = await this.loadConversation();
     if (
       !conversation ||
@@ -54,7 +50,7 @@ class Index extends Component {
       util.parseThreshold(conversation.name) < 1 ||
       conversation.participants.length < 3
     ) {
-      this.setState({ guide: true });
+      this.setState({ loading: false, guide: true });
       return;
     }
     let participantIds = [];
@@ -188,6 +184,10 @@ class Index extends Component {
 
     if (state.loading) {
       return <Loading />;
+    }
+
+    if (state.guide) {
+      return <Redirect to="/guide" />;
     }
 
     let assets = state.assets.map((asset) => {

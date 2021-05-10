@@ -40,11 +40,11 @@ class Client {
             let clientId = process.env.REACT_APP_CLIENT_ID;
             switch (resp.error.code) {
               case 401:
+                let verifier = mixin.util.challenge();
                 window.location.replace(
-                  `https://mixin.one/oauth/authorize?client_id=${clientId}&scope=PROFILE:READ+ASSETS:READ+CONTACTS:READ&response_type=code&code_challenge=` +
-                  mixin.util.challenge()
+                  `https://mixin.one/oauth/authorize?client_id=${clientId}&scope=PROFILE:READ+ASSETS:READ+CONTACTS:READ&response_type=code&code_challenge=${verifier}`
                 );
-                break;
+                return;
               default:
                 break;
             }

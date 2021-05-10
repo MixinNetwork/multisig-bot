@@ -77,7 +77,7 @@ export const ApiPostGhostKeys = (ids, index) => {
   );
 };
 export const ApiGetConversation = (id) => {
-  if (process.env.environment !== "production") {
+  if (process.env.NODE_ENV !== "production") {
     id = process.env.REACT_APP_CONVERSATION_ID;
   }
   return client.requestByToken(
@@ -95,7 +95,6 @@ export const ApiPostAuthenticate = (code) => {
     code: code,
     code_verifier: storage.getVerifier(),
   };
-  console.log(params);
 
   return client
     .requestByToken("POST", "/oauth/token", params, "")
