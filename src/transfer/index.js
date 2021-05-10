@@ -104,8 +104,8 @@ class Index extends Component {
       "app_id":"${process.env.REACT_APP_CLIENT_ID}",
       "description":"${description.slice(0, 128)}",
       "icon_url":"https://mixin-images.zeromesh.net/6PseFQN9dxx7GuMjvCsLWTJ2VdBGyVlwTpdHtuY64FlxnjuPkm4tnartPC_1wlKcdxQTpIQQipePPIsUe35ZSk0fgRb8AC-b7NFglA=s256",
-      "title":"${window.i18n.t("transfer.card.title")}",
-    }`;
+      "title":"${window.i18n.t("transfer.card.title")}"
+      }`;
       window.open(
         "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
       );
