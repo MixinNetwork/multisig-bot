@@ -7,6 +7,8 @@ import {
   ApiPostUsersFetch,
   ApiPostMultisigsRequests,
   ApiPostExternalProxy,
+  ApiGetCode,
+  ApiGetMe,
 } from "../api";
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
@@ -24,8 +26,17 @@ class Show extends Component {
       utxo: props.location.utxo,
       asset: {},
       users: {},
+      user: {},
       loading: true,
     };
+  }
+
+  async loadUser() {
+    let user = await ApiGetMe();
+    if (user.data) {
+      return user.data;
+    }
+    return this.loadUser();
   }
 
   async loadAsset() {
@@ -84,7 +95,25 @@ class Show extends Component {
     for (let i in users) {
       usersMap[users[i].user_id] = users[i];
     }
-    this.setState({ utxo: utxo, asset: asset, users: usersMap, loading: false });
+    let user = await this.loadUser()
+    this.setState({ utxo: utxo, asset: asset, users: usersMap, user: user, loading: false });
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async loadCode(codeId) {
+    let code = await ApiGetCode(codeId);
+    if (code.data && code.data.state === "signed") {
+      let utxo = this.state.utxo;
+      utxo.signers = code.data.signers;
+      utxo.signed_tx = code.data.raw_transaction;
+      this.setState({ home: true });
+      return;
+    }
+    await this.sleep(1000);
+    return this.loadCode(codeId);
   }
 
   sendRawTransaction = () => {
@@ -96,6 +125,18 @@ class Show extends Component {
       utxo.state = "spent";
       this.setState({ utxo: utxo });
     });
+  }
+
+  signRawTransaction = () => {
+    ApiPostMultisigsRequests("sign", this.state.utxo.signed_tx).then((resp) => {
+      if (resp.error) {
+        return;
+      }
+      let text = `https://mixin.one/codes/${resp.data.code_id}`;
+      console.log(text);
+      window.open('mixin://codes/' + resp.data.code_id);
+      this.loadCode(resp.data.code_id);
+    })
   }
 
   componentDidMount() {
@@ -157,6 +198,12 @@ class Show extends Component {
     let sendRawTransactionButton = (
       <button onClick={ this.sendRawTransaction } className={ `submit` }>
         { i18n.t("transfer.detail.send") }
+      </button>
+    );
+
+    let signTransactionButton = (
+      <button onClick={ this.signRawTransaction } className={ `submit` }>
+        { i18n.t("transfer.detail.sign") }
       </button>
     );
 
@@ -240,6 +287,7 @@ class Show extends Component {
           </div>
           <div className={ styles.action }>
             { state.utxo.state === "signed" && state.utxo.signers.length >= state.utxo.threshold && sendRawTransactionButton }
+            { state.utxo.state === "signed" && state.utxo.signers.length < state.utxo.threshold && !state.utxo.signers.includes(state.user.user_id) && signTransactionButton }
           </div>
         </div>
       </div>

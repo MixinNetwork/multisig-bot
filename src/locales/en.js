@@ -81,6 +81,7 @@ const transfer = {
       memo: "Memo",
       time: "Updated At",
       send: "Submit the Transaction",
+      sign: "Sign Multisig Transaction",
     },
   },
 };

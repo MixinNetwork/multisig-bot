@@ -76,7 +76,7 @@ class Index extends Component {
       participants,
       threshold,
       "",
-      threshold
+      offset
     );
     if (outputs.data) {
       utxo.push(...outputs.data);
@@ -97,12 +97,14 @@ class Index extends Component {
     let participants = [];
     conversation.participants.forEach((p) => {
       if (
-        process.env.VUE_APP_CLIENT_ID !== p.user_id &&
+        process.env.REACT_APP_CLIENT_ID !== p.user_id &&
         "37e040ec-df91-47a7-982e-0e118932fa8b" !== p.user_id
       ) {
         participants.push(p.user_id);
       }
     });
+    console.log(conversation.participants, participants,
+      process.env)
     let transactions = [];
     let outputs = await that.loadMultisigsOutputs(
       participants,

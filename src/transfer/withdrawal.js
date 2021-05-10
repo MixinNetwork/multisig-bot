@@ -137,7 +137,6 @@ class Withdrawal extends Component {
     let raw = window.mixinGo.buildTransaction(JSON.stringify(tx));
     console.log(raw);
     ApiPostMultisigsRequests("sign", raw).then((resp) => {
-      console.log("sign", resp);
       if (resp.error) {
         return;
       }
@@ -156,6 +155,7 @@ class Withdrawal extends Component {
     let code = await ApiGetCode(codeId);
     if (code.data && code.data.state === "signed") {
       this.setState({ home: true });
+      return;
     }
     await this.sleep(1000);
     return this.loadCode(codeId);
@@ -230,7 +230,7 @@ class Withdrawal extends Component {
     let participants = [];
     conversation.participants.forEach((p) => {
       if (
-        process.env.VUE_APP_CLIENT_ID !== p.user_id &&
+        process.env.REACT_APP_CLIENT_ID !== p.user_id &&
         "37e040ec-df91-47a7-982e-0e118932fa8b" !== p.user_id
       ) {
         participants.push(p.user_id);
