@@ -103,8 +103,6 @@ class Index extends Component {
         participants.push(p.user_id);
       }
     });
-    console.log(conversation.participants, participants,
-      process.env)
     let transactions = [];
     let outputs = await that.loadMultisigsOutputs(
       participants,

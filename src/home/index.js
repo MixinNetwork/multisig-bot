@@ -43,6 +43,10 @@ class Index extends Component {
   }
 
   async loadFullData() {
+    if (!mixin.util.conversationId()) {
+      this.setState({ guide: true });
+      return
+    }
     let conversation = await this.loadConversation();
     if (
       !conversation ||

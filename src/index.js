@@ -7,8 +7,6 @@ import Locale from "./locales";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
-require("./utils/transaction.js");
-
 window.i18n = new Locale(navigator.language);
 
 ReactDOM.render(
