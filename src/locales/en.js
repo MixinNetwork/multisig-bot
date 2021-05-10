@@ -65,7 +65,7 @@ const transfer = {
     pay: "Generate & pay",
     withdrawal: "Withdrawal",
     card: {
-      title: "Multisig Payment",
+      title: "Multisig Wallet",
       description: "From %{body}",
       icon_url:
       "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
