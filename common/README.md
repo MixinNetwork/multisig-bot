@@ -4,7 +4,7 @@
 4. ./go/bin/go get
 5. MixinNetwork/mixin checkout to v0.12.1
 6. gopherjs build
-7. mv common.js ../transaction.js
+7. mv common.js ./src/utils/transaction.js
 
 For react
 add /* eslint-disable */ to transaction.js
