@@ -32,6 +32,7 @@ class Index extends Component {
       threshold: 0,
       modal: false,
       loading: true,
+      guide: false,
     };
 
     this.handleModal = this.handleModal.bind(this);
@@ -49,7 +50,8 @@ class Index extends Component {
       util.parseThreshold(conversation.name) < 1 ||
       conversation.participants.length < 3
     ) {
-      this.$router.push("/guide");
+      this.setState({ guide: true });
+      return;
     }
     let participantIds = [];
     conversation.participants.forEach((p) => {

@@ -2,7 +2,7 @@ import styles from "./index.module.scss";
 import React, { Component } from "react";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import {
   ApiGetAsset,
@@ -143,6 +143,10 @@ class Index extends Component {
 
     if (state.loading) {
       return <Loading />;
+    }
+
+    if (state.guide) {
+      return <Redirect to="/guide" />;
     }
 
     let blank = (

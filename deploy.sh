@@ -11,4 +11,4 @@ mv build/index.html build/index.$SUM.html
 
 cp app.yaml build/app.yaml
 sed -i ''  "s/index.html/index.$SUM.html/g" build/app.yaml || exit
-cd build && gcloud app deploy app.yaml -y
+cd build && gcloud app deploy app.yaml
