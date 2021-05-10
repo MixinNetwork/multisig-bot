@@ -1,0 +1,14 @@
+runtime: python38
+service: multisig-wallet
+
+handlers:
+  - url: /static
+    static_dir: /static
+
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
+
+- url: /.*
+  static_files: index.html
+  upload: index.html
