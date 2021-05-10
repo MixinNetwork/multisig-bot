@@ -103,7 +103,7 @@ class Index extends Component {
       "action":"${text}",
       "app_id":"${process.env.REACT_APP_CLIENT_ID}",
       "description":"${description.slice(0, 128)}",
-      "icon_url":"https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256",
+      "icon_url":"https://mixin-images.zeromesh.net/6PseFQN9dxx7GuMjvCsLWTJ2VdBGyVlwTpdHtuY64FlxnjuPkm4tnartPC_1wlKcdxQTpIQQipePPIsUe35ZSk0fgRb8AC-b7NFglA=s256",
       "title":"${window.i18n.t("transfer.card.title")}",
     }`;
       window.open(
