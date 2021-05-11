@@ -28,17 +28,15 @@ class Index extends Component {
       balanceBTC: 0,
       balanceUSD: 0,
       assets: [],
-      participants_count: 0,
+      participantsCount: 0,
       threshold: 0,
       modal: false,
       loading: true,
       guide: false,
     };
-
-    this.handleModal = this.handleModal.bind(this);
   }
 
-  handleModal(b) {
+  handleModal = (b) => {
     this.setState({ modal: b });
   }
 
@@ -115,7 +113,7 @@ class Index extends Component {
       balanceBTC: balanceBTC,
       balanceUSD: balanceUSD,
       assets: assets,
-      participants_count: participantIds.length,
+      participantsCount: participantIds.length,
       threshold: util.parseThreshold(conversation.name),
       loading: false,
     });
@@ -219,7 +217,7 @@ class Index extends Component {
         className={styles.home}
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header to="/" icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participants_count}`})} />
+        <Header to="/" icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participantsCount}`})} />
         <div className={styles.balance}>
           <div className={styles.btc}>
             {state.balanceBTC} <span>BTC</span>

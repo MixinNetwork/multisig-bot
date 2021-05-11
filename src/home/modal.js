@@ -169,7 +169,7 @@ class Modal extends Component {
           <div className={styles.value}>
             <div
               className={
-                asset.change_usd.indexOf("-") > -1 ? styles.red : styles.geen
+                asset.change_usd.indexOf("-") > -1 ? 'red' : 'green'
               }
             >
               {asset.change_usd}%
