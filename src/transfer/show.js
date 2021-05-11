@@ -165,7 +165,9 @@ class Show extends Component {
         return "";
       }
       return (
-        <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+        <a href={ `mixin://users/${ user.user_id }` }>
+          <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+        </a>
       );
     });
 
@@ -177,7 +179,9 @@ class Show extends Component {
           return "";
         }
         return (
-          <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+          <a href={ `mixin://users/${ user.user_id }` }>
+            <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+          </a>
         );
       });
     }
@@ -190,7 +194,9 @@ class Show extends Component {
           return "";
         }
         return (
-          <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+          <a href={ `mixin://users/${ user.user_id }` }>
+            <img className={ styles.user } src={ user.avatar_url } alt={ user.full_name } key={ user.user_id } />
+          </a>
         );
       });
     }
