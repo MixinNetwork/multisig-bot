@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import Decimal from "decimal.js";
 import mixin from "bot-api-js-client";
+import {Base64} from 'js-base64';
 
 import {
   ApiGetAsset,
@@ -37,7 +38,7 @@ class Withdrawal extends Component {
       memo: "",
       loading: true,
       submit: "prepare", // prepare, ready, submitting
-      home: false,
+      back: false,
     };
   }
 
@@ -154,7 +155,24 @@ class Withdrawal extends Component {
   async loadCode(codeId) {
     let code = await ApiGetCode(codeId);
     if (code.data && code.data.state === "signed") {
-      this.setState({ home: true });
+      let description = window.i18n.t("transfer.card.withdrawal", {
+        amount: "",
+        symbol: "",
+        user: "",
+      });
+      let text = `https://multisig.mixin.zone/assets/${this.state.assetId}`;
+      let data = `{
+      "action": "${text}",
+      "app_id": "${process.env.REACT_APP_CLIENT_ID}",
+      "icon_url": "https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
+      "description": "${description.slice(0, 128)}",
+      "title": "${window.i18n.t("transfer.card.title")}"
+      }`;
+      window.open(
+        "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
+      );
+
+      this.setState({ back: true });
       return;
     }
     await this.sleep(1000);
@@ -277,8 +295,8 @@ class Withdrawal extends Component {
       return <Loading />;
     }
 
-    if (state.home) {
-      return <Redirect to="/" />;
+    if (state.back) {
+      return <Redirect to={ `/assets/${state.assetId}` } />;
     }
 
     return (

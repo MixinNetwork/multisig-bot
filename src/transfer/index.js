@@ -100,11 +100,11 @@ class Index extends Component {
       });
 
       let data = `{
-      "action":"${text}",
-      "app_id":"${process.env.REACT_APP_CLIENT_ID}",
-      "description":"${description.slice(0, 128)}",
-      "icon_url":"https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
-      "title":"${window.i18n.t("transfer.card.title")}"
+      "action": "${text}",
+      "app_id": "${process.env.REACT_APP_CLIENT_ID}",
+      "icon_url": "https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
+      "description": "${description.slice(0, 128)}",
+      "title": "${window.i18n.t("transfer.card.title")}"
       }`;
       window.open(
         "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
