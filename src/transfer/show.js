@@ -85,6 +85,7 @@ class Show extends Component {
     memberIds.push(this.state.utxo.sender);
     if (this.state.utxo.state === "signed") {
       let request = await this.postMultisigsRequest();
+      utxo.transferAmount = request.amount;
       utxo.signers = request.signers;
       utxo.receivers = request.receivers;
       memberIds.push(...request.signers);
@@ -222,7 +223,7 @@ class Show extends Component {
         <div className={styles.info}>
           <AssetIcon asset={state.asset} />
           <div className={styles.balance}>
-            { state.utxo.state === "unspent" ? "+" : "-" }
+            {state.utxo.state === "spent" ? "-" : "+"}
             {state.utxo.amount}
             <span>{state.asset.symbol}</span>
           </div>
@@ -247,6 +248,16 @@ class Show extends Component {
             </div>
             { state.utxo.state }
           </div>
+          {
+            this.state.utxo.state === "signed" && (
+              <div className={ styles.group }>
+                <div className={ styles.title }>
+                  { i18n.t("transfer.detail.amount") }
+                </div>
+                -{ state.utxo.transferAmount }
+              </div>
+            )
+          }
           <div className={ styles.group }>
             <div className={ styles.title }>
               { i18n.t("transfer.detail.threshold") }

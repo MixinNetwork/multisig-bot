@@ -115,7 +115,7 @@ class Index extends Component {
         if (transactions.length < 500) {
           transactions.push(c); // Only list latest 500 transactions
         }
-        if (c.state === "unspent") {
+        if (c.state !== "spent") {
           return a.plus(c.amount);
         }
       }
@@ -166,7 +166,7 @@ class Index extends Component {
     }).map((o) => {
       let created = new Date(o.updated_at);
       let divide = hint !== created.getDate();
-      let style = o.state === "unspent" ? "green" : "red";
+      let style = o.state === "spent" ? "red" : "green" ;
       hint = created.getDate();
       return (
         <li key={o.utxo_id}>
@@ -184,7 +184,7 @@ class Index extends Component {
                 { o.state === "signed" && <div className={ styles.state }>{ i18n.t("asset.signed") }</div> }
               </div>
               <div className={ `${styles.amount} ${ style }`} >
-                { o.state === "unspent" ? "+" : "-" }
+                { o.state === "spent" ? "-" : "+" }
                 { o.amount }
               </div>
               <div className={styles.symbol}>{state.asset.symbol}</div>

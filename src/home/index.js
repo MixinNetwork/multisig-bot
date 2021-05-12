@@ -65,9 +65,18 @@ class Index extends Component {
     let outputs = await this.loadMultisigsOutputs(
       participantIds,
       util.parseThreshold(conversation.name),
+      "unspent",
       "",
       []
     );
+    let signed = await this.loadMultisigsOutputs(
+      participantIds,
+      util.parseThreshold(conversation.name),
+      "signed",
+      "",
+      []
+    );
+    outputs.push(...signed);
     let assetSet = storage.getSelectedAssets();
     for (let i = 0; i < outputs.length; i++) {
       if (!assetSet[outputs[i].asset_id]) {
@@ -128,11 +137,11 @@ class Index extends Component {
     }
     return this.loadConversation();
   }
-  async loadMultisigsOutputs(participants, threshold, offset, utxo) {
+  async loadMultisigsOutputs(participants, threshold, state, offset, utxo) {
     let outputs = await ApiGetMultisigsOutputs(
       participants,
       threshold,
-      "unspent",
+      state,
       offset,
     );
     if (outputs.data) {

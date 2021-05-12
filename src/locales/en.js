@@ -74,6 +74,7 @@ const transfer = {
       transaction_id: "Transaction ID",
       asset_type: "Asset Type",
       state: "UTXO state",
+      amount: "Transfer Amount",
       threshold: "Threshold",
       members: "Members",
       receivers: "Receivers",
