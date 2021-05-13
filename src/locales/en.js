@@ -69,7 +69,7 @@ const transfer = {
       description: "From %{body}",
       withdrawal: "Withdrawal %{amount}%{symbol} to %{user}",
       icon_url:
-      "https://mixin-images.zeromesh.net/rl_7ufE4eezlZDDjsGz9apzvoa7ULeZLlyixbN04iiaGFng8JL9UtQVZwzHw4Bsh2_7m5WHVPwtWkLKOydGZ4Q=s256", // TODO
+      "https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
     },
     detail: {
       transaction_id: "Transaction ID",
