@@ -68,18 +68,18 @@ func buildTransaction(data string) string {
 
 type signerInput struct {
 	Inputs []struct {
-		Hash  crypto.Hash  `json:"hash"`
-		Index int          `json:"index"`
-		Keys  []crypto.Key `json:"keys"`
-		Mask  crypto.Key   `json:"mask"`
+		Hash  crypto.Hash   `json:"hash"`
+		Index int           `json:"index"`
+		Keys  []*crypto.Key `json:"keys"`
+		Mask  crypto.Key    `json:"mask"`
 	} `json:"inputs"`
 	Outputs []struct {
-		Type     uint8        `json:"type"`
-		Mask     crypto.Key   `json:"mask"`
-		Keys     []crypto.Key `json:"keys"`
-		Amount   Integer      `json:"amount"`
-		Script   Script       `json:"script"`
-		Accounts []Address    `json:"accounts"`
+		Type     uint8         `json:"type"`
+		Mask     crypto.Key    `json:"mask"`
+		Keys     []*crypto.Key `json:"keys"`
+		Amount   Integer       `json:"amount"`
+		Script   Script        `json:"script"`
+		Accounts []Address     `json:"accounts"`
 	}
 	Asset crypto.Hash `json:"asset"`
 	Extra string      `json:"extra"`

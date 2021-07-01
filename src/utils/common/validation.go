@@ -20,14 +20,24 @@ func (ver *VersionedTransaction) Validate(store DataStore) error {
 	if len(tx.Inputs) < 1 || len(tx.Outputs) < 1 {
 		return fmt.Errorf("invalid tx inputs or outputs %d %d", len(tx.Inputs), len(tx.Outputs))
 	}
-	if len(tx.Inputs) != len(tx.SignaturesMap) && txType != TransactionTypeNodeAccept && txType != TransactionTypeNodeRemove {
-		return fmt.Errorf("invalid tx signature number %d %d %d", len(tx.Inputs), len(tx.SignaturesMap), txType)
+	if len(tx.Inputs) > SliceCountLimit || len(tx.Outputs) > SliceCountLimit {
+		return fmt.Errorf("invalid tx inputs or outputs %d %d", len(tx.Inputs), len(tx.Outputs))
 	}
 	if len(tx.Extra) > ExtraSizeLimit {
 		return fmt.Errorf("invalid extra size %d", len(tx.Extra))
 	}
-	if len(ver.Marshal()) > TransactionMaximumSize {
+	if len(msg) > TransactionMaximumSize {
 		return fmt.Errorf("invalid transaction size %d", len(msg))
+	}
+
+	if tx.AggregatedSignature != nil {
+		if tx.SignaturesMap != nil {
+			return fmt.Errorf("invalid signatures map %d", len(tx.SignaturesMap))
+		}
+	} else {
+		if len(tx.Inputs) != len(tx.SignaturesMap) && txType != TransactionTypeNodeAccept && txType != TransactionTypeNodeRemove {
+			return fmt.Errorf("invalid tx signature number %d %d %d", len(tx.Inputs), len(tx.SignaturesMap), txType)
+		}
 	}
 
 	inputsFilter, inputAmount, err := validateInputs(store, tx, msg, ver.PayloadHash(), txType)
@@ -81,9 +91,10 @@ func validateScriptTransaction(inputs map[string]*UTXO) error {
 	return nil
 }
 
-func validateInputs(store DataStore, tx *SignedTransaction, msg []byte, hash crypto.Hash, txType uint8) (map[string]*UTXO, Integer, error) {
+func validateInputs(store UTXOLockReader, tx *SignedTransaction, msg []byte, hash crypto.Hash, txType uint8) (map[string]*UTXO, Integer, error) {
 	inputAmount := NewInteger(0)
 	inputsFilter := make(map[string]*UTXO)
+	allKeys := make([]*crypto.Key, 0)
 	keySigs := make(map[*crypto.Key]*crypto.Signature)
 
 	for i, in := range tx.Inputs {
@@ -100,7 +111,7 @@ func validateInputs(store DataStore, tx *SignedTransaction, msg []byte, hash cry
 			return inputsFilter, inputAmount, fmt.Errorf("invalid input %s", fk)
 		}
 
-		utxo, err := store.ReadUTXO(in.Hash, in.Index)
+		utxo, err := store.ReadUTXOLock(in.Hash, in.Index)
 		if err != nil {
 			return inputsFilter, inputAmount, err
 		}
@@ -114,34 +125,47 @@ func validateInputs(store DataStore, tx *SignedTransaction, msg []byte, hash cry
 			return inputsFilter, inputAmount, fmt.Errorf("input locked for transaction %s", utxo.LockHash)
 		}
 
-		err = validateUTXO(i, &utxo.UTXO, tx.SignaturesMap, msg, txType, keySigs)
+		err = validateUTXO(i, &utxo.UTXO, tx.SignaturesMap, tx.AggregatedSignature, msg, txType, keySigs, len(allKeys))
 		if err != nil {
 			return inputsFilter, inputAmount, err
 		}
 		inputsFilter[fk] = &utxo.UTXO
 		inputAmount = inputAmount.Add(utxo.Amount)
+		allKeys = append(allKeys, utxo.Keys...)
 	}
 
 	if len(keySigs) == 0 && (txType == TransactionTypeNodeAccept || txType == TransactionTypeNodeRemove) {
 		return inputsFilter, inputAmount, nil
 	}
-
-	var keys []*crypto.Key
-	var sigs []*crypto.Signature
-	for k, s := range keySigs {
-		keys = append(keys, k)
-		sigs = append(sigs, s)
+	if len(keySigs) < len(tx.Inputs) {
+		return inputsFilter, inputAmount, fmt.Errorf("batch verification not ready %d %d", len(tx.Inputs), len(keySigs))
 	}
-	if !crypto.BatchVerify(msg, keys, sigs) {
-		return inputsFilter, inputAmount, fmt.Errorf("batch verification failure %d %d", len(keys), len(sigs))
+	if as := tx.AggregatedSignature; as != nil {
+		err := crypto.AggregateVerify(&as.Signature, allKeys, as.Signers, msg)
+		if err != nil {
+			return inputsFilter, inputAmount, fmt.Errorf("aggregate verification failure %s", err)
+		}
+	} else {
+		var keys []*crypto.Key
+		var sigs []*crypto.Signature
+		for k, s := range keySigs {
+			keys = append(keys, k)
+			sigs = append(sigs, s)
+		}
+		if !crypto.BatchVerify(msg, keys, sigs) {
+			return inputsFilter, inputAmount, fmt.Errorf("batch verification failure %d %d", len(keys), len(sigs))
+		}
 	}
 	return inputsFilter, inputAmount, nil
 }
 
-func (tx *Transaction) validateOutputs(store DataStore) (Integer, error) {
+func (tx *Transaction) validateOutputs(store GhostChecker) (Integer, error) {
 	outputAmount := NewInteger(0)
 	outputsFilter := make(map[crypto.Key]bool)
 	for _, o := range tx.Outputs {
+		if len(o.Keys) > SliceCountLimit {
+			return outputAmount, fmt.Errorf("invalid output keys count %d", len(o.Keys))
+		}
 		if o.Amount.Sign() <= 0 {
 			return outputAmount, fmt.Errorf("invalid output amount %s", o.Amount.String())
 		}
@@ -152,14 +176,14 @@ func (tx *Transaction) validateOutputs(store DataStore) (Integer, error) {
 		}
 
 		for _, k := range o.Keys {
-			if outputsFilter[k] {
+			if outputsFilter[*k] {
 				return outputAmount, fmt.Errorf("invalid output key %s", k.String())
 			}
-			outputsFilter[k] = true
+			outputsFilter[*k] = true
 			if !k.CheckKey() {
 				return outputAmount, fmt.Errorf("invalid output key format %s", k.String())
 			}
-			exist, err := store.CheckGhost(k)
+			exist, err := store.CheckGhost(*k)
 			if err != nil {
 				return outputAmount, err
 			} else if exist {
@@ -200,16 +224,30 @@ func (tx *Transaction) validateOutputs(store DataStore) (Integer, error) {
 	return outputAmount, nil
 }
 
-func validateUTXO(index int, utxo *UTXO, sigs []map[uint16]*crypto.Signature, msg []byte, txType uint8, keySigs map[*crypto.Key]*crypto.Signature) error {
+func validateUTXO(index int, utxo *UTXO, sigs []map[uint16]*crypto.Signature, as *AggregatedSignature, msg []byte, txType uint8, keySigs map[*crypto.Key]*crypto.Signature, offset int) error {
 	switch utxo.Type {
 	case OutputTypeScript, OutputTypeNodeRemove:
-		for i, sig := range sigs[index] {
-			if int(i) >= len(utxo.Keys) {
-				return fmt.Errorf("invalid signature map index %d %d", i, len(utxo.Keys))
+		if as != nil {
+			signers, limit := 0, offset+len(utxo.Keys)
+			for _, m := range as.Signers {
+				if m >= limit {
+					break
+				} else if m < offset {
+					continue
+				}
+				keySigs[utxo.Keys[m-offset]] = nil
+				signers += 1
 			}
-			keySigs[&utxo.Keys[i]] = sig
+			return utxo.Script.Validate(signers)
+		} else {
+			for i, sig := range sigs[index] {
+				if int(i) >= len(utxo.Keys) {
+					return fmt.Errorf("invalid signature map index %d %d", i, len(utxo.Keys))
+				}
+				keySigs[utxo.Keys[i]] = sig
+			}
+			return utxo.Script.Validate(len(sigs[index]))
 		}
-		return utxo.Script.Validate(len(sigs[index]))
 	case OutputTypeNodePledge:
 		if txType == TransactionTypeNodeAccept || txType == TransactionTypeNodeCancel {
 			return nil

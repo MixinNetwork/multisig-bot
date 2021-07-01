@@ -69,12 +69,29 @@ func (dec *Decoder) DecodeTransaction() (*SignedTransaction, error) {
 	if err != nil {
 		return nil, err
 	}
-	for ; sl > 0; sl -= 1 {
-		sm, err := dec.ReadSignatures()
+	if sl == MaximumEncodingInt {
+		prefix, err := dec.ReadInt()
 		if err != nil {
 			return nil, err
 		}
-		tx.SignaturesMap = append(tx.SignaturesMap, sm)
+		switch prefix {
+		case AggregatedSignaturePrefix:
+			js, err := dec.ReadAggregatedSignature()
+			if err != nil {
+				return nil, err
+			}
+			tx.AggregatedSignature = js
+		default:
+			return nil, fmt.Errorf("invalid prefix %d", prefix)
+		}
+	} else {
+		for ; sl > 0; sl -= 1 {
+			sm, err := dec.ReadSignatures()
+			if err != nil {
+				return nil, err
+			}
+			tx.SignaturesMap = append(tx.SignaturesMap, sm)
+		}
 	}
 
 	es, err := dec.buf.ReadByte()
@@ -196,7 +213,7 @@ func (dec *Decoder) ReadOutput() (*Output, error) {
 		if err != nil {
 			return nil, err
 		}
-		o.Keys = append(o.Keys, k)
+		o.Keys = append(o.Keys, &k)
 	}
 
 	err = dec.Read(o.Mask[:])
@@ -236,7 +253,7 @@ func (dec *Decoder) ReadOutput() (*Output, error) {
 		if err != nil {
 			return nil, err
 		}
-		w.Address = string(tb)
+		w.Tag = string(tb)
 
 		o.Withdrawal = &w
 	}
@@ -282,16 +299,8 @@ func (dec *Decoder) Read(b []byte) error {
 }
 
 func (dec *Decoder) ReadInt() (int, error) {
-	var b [2]byte
-	err := dec.Read(b[:])
-	if err != nil {
-		return 0, err
-	}
-	d := binary.BigEndian.Uint16(b[:])
-	if d > 256 {
-		return 0, fmt.Errorf("large int %d", d)
-	}
-	return int(d), nil
+	d, err := dec.ReadUint16()
+	return int(d), err
 }
 
 func (dec *Decoder) ReadUint16() (uint16, error) {
@@ -301,7 +310,7 @@ func (dec *Decoder) ReadUint16() (uint16, error) {
 		return 0, err
 	}
 	d := binary.BigEndian.Uint16(b[:])
-	if d > 256 {
+	if d > MaximumEncodingInt {
 		return 0, fmt.Errorf("large int %d", d)
 	}
 	return d, nil
@@ -358,4 +367,47 @@ func (dec *Decoder) ReadMagic() (bool, error) {
 		return false, nil
 	}
 	return false, fmt.Errorf("malformed %v", b)
+}
+
+func (dec *Decoder) ReadAggregatedSignature() (*AggregatedSignature, error) {
+	var js AggregatedSignature
+	err := dec.Read(js.Signature[:])
+	if err != nil {
+		return nil, err
+	}
+
+	typ, err := dec.buf.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	switch typ {
+	case AggregatedSignatureSparseMask:
+		l, err := dec.ReadInt()
+		if err != nil {
+			return nil, err
+		}
+		for ; l > 0; l-- {
+			m, err := dec.ReadInt()
+			if err != nil {
+				return nil, err
+			}
+			js.Signers = append(js.Signers, m)
+		}
+	case AggregatedSignatureOrdinayMask:
+		masks, err := dec.ReadBytes()
+		if err != nil {
+			return nil, err
+		}
+		for i, ctr := range masks {
+			for j := byte(0); j < 8; j++ {
+				k := byte(1) << j
+				if ctr&k == k {
+					js.Signers = append(js.Signers, i*8+int(j))
+				}
+			}
+		}
+	default:
+		return nil, fmt.Errorf("invalid mask type %d", typ)
+	}
+	return &js, nil
 }

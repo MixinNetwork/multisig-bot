@@ -15,14 +15,23 @@ type UTXOWithLock struct {
 	LockHash crypto.Hash
 }
 
-type UTXOReader interface {
-	ReadUTXO(hash crypto.Hash, index int) (*UTXOWithLock, error)
+type UTXOKeys struct {
+	Mask crypto.Key
+	Keys []*crypto.Key
+}
+
+type UTXOKeysReader interface {
+	ReadUTXOKeys(hash crypto.Hash, index int) (*UTXOKeys, error)
+}
+
+type UTXOLockReader interface {
+	ReadUTXOLock(hash crypto.Hash, index int) (*UTXOWithLock, error)
 	CheckDepositInput(deposit *DepositData, tx crypto.Hash) error
 	ReadLastMintDistribution(group string) (*MintDistribution, error)
 }
 
 type UTXOLocker interface {
-	LockUTXO(hash crypto.Hash, index uint64, tx crypto.Hash, fork bool) error
+	LockUTXOs(inputs []*Input, tx crypto.Hash, fork bool) error
 	LockDepositInput(deposit *DepositData, tx crypto.Hash, fork bool) error
 	LockMintInput(mint *MintData, tx crypto.Hash, fork bool) error
 }
@@ -41,7 +50,7 @@ type DomainReader interface {
 }
 
 type DataStore interface {
-	UTXOReader
+	UTXOLockReader
 	UTXOLocker
 	GhostChecker
 	NodeReader

@@ -14,8 +14,9 @@ const (
 )
 
 const (
-	TxVersion      = 0x02
-	ExtraSizeLimit = 256
+	TxVersion       = 0x02
+	ExtraSizeLimit  = 256
+	SliceCountLimit = 256
 
 	OutputTypeScript             = 0x00
 	OutputTypeWithdrawalSubmit   = 0xa1
@@ -59,7 +60,7 @@ type Input struct {
 type Output struct {
 	Type       uint8
 	Amount     Integer
-	Keys       []crypto.Key
+	Keys       []*crypto.Key
 	Withdrawal *WithdrawalData `msgpack:",omitempty"`
 
 	// OutputTypeScript fields
@@ -77,8 +78,9 @@ type Transaction struct {
 
 type SignedTransaction struct {
 	Transaction
-	SignaturesMap     []map[uint16]*crypto.Signature `msgpack:"Signatures"`
-	SignaturesSliceV1 [][]*crypto.Signature          `msgpack:"-"`
+	AggregatedSignature *AggregatedSignature           `msgpack:"-"`
+	SignaturesMap       []map[uint16]*crypto.Signature `msgpack:"-"`
+	SignaturesSliceV1   [][]*crypto.Signature          `msgpack:"-"`
 }
 
 func (tx *Transaction) ViewGhostKey(a *crypto.Key) []*Output {
@@ -96,8 +98,8 @@ func (tx *Transaction) ViewGhostKey(a *crypto.Key) []*Output {
 			Mask:   o.Mask,
 		}
 		for _, k := range o.Keys {
-			key := crypto.ViewGhostOutputKey(&k, a, &o.Mask, uint64(i))
-			out.Keys = append(out.Keys, *key)
+			key := crypto.ViewGhostOutputKey(k, a, &o.Mask, uint64(i))
+			out.Keys = append(out.Keys, key)
 		}
 		outputs = append(outputs, out)
 	}
@@ -175,13 +177,13 @@ func (signed *SignedTransaction) SignUTXO(utxo *UTXO, accounts []*Address) error
 	return nil
 }
 
-func (signed *SignedTransaction) SignInput(reader UTXOReader, index uint64, accounts []*Address) error {
+func (signed *SignedTransaction) SignInput(reader UTXOKeysReader, index int, accounts []*Address) error {
 	msg := signed.AsLatestVersion().PayloadMarshal()
 
 	if len(accounts) == 0 {
 		return nil
 	}
-	if index >= uint64(len(signed.Inputs)) {
+	if index >= len(signed.Inputs) {
 		return fmt.Errorf("invalid input index %d/%d", index, len(signed.Inputs))
 	}
 	in := signed.Inputs[index]
@@ -189,7 +191,7 @@ func (signed *SignedTransaction) SignInput(reader UTXOReader, index uint64, acco
 		return signed.SignRaw(accounts[0].PrivateSpendKey)
 	}
 
-	utxo, err := reader.ReadUTXO(in.Hash, in.Index)
+	utxo, err := reader.ReadUTXOKeys(in.Hash, in.Index)
 	if err != nil {
 		return err
 	}
@@ -258,7 +260,7 @@ func (tx *Transaction) AddOutputWithType(ot uint8, accounts []*Address, s Script
 		Type:   ot,
 		Amount: amount,
 		Script: s,
-		Keys:   make([]crypto.Key, 0),
+		Keys:   make([]*crypto.Key, 0),
 	}
 
 	if len(accounts) > 0 {
@@ -266,7 +268,7 @@ func (tx *Transaction) AddOutputWithType(ot uint8, accounts []*Address, s Script
 		out.Mask = r.Public()
 		for _, a := range accounts {
 			k := crypto.DeriveGhostPublicKey(&r, &a.PublicViewKey, &a.PublicSpendKey, uint64(len(tx.Outputs)))
-			out.Keys = append(out.Keys, *k)
+			out.Keys = append(out.Keys, k)
 		}
 	}
 
