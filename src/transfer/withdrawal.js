@@ -52,7 +52,7 @@ class Withdrawal extends Component {
       ).toFixed();
       state["value"] = v;
 
-      let ready = value !== "" && (new Decimal(value)).gt(new Decimal("0")) && (new Decimal(value)).lt(new Decimal(this.state.asset.balance));
+      let ready = value !== "" && (new Decimal(value)).gt(new Decimal("0")) && (new Decimal(value)).lte(new Decimal(this.state.asset.balance));
       if (this.state.submit !== "submitting") {
         state["submit"] = ready ? "ready" : "prepare";
       }
