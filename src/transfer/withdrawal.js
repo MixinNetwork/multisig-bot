@@ -102,6 +102,9 @@ class Withdrawal extends Component {
     }
     for (let i in this.state.outputs) {
       let utxo = this.state.outputs[i];
+      if (utxo.asset_id != this.state.assetId) {
+        continue;
+      };
       inputAmount = inputAmount.add(new Decimal(utxo.amount));
       tx.inputs.push({
         hash: utxo.transaction_hash,
