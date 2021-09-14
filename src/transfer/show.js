@@ -120,7 +120,7 @@ class Show extends Component {
       this.setState({
         utxo: utxo,
       });
-      if (utxo.signers.length > utxo.threshold) {
+      if (utxo.signers.length >= utxo.threshold) {
         this.sendRawTransaction();
       }
       return;
