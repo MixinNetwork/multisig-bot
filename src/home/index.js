@@ -70,87 +70,96 @@ class Index extends Component {
       threshold: threshold,
       loading: false,
     });
+
     // multisig output assets will always display
-    let outputs = await this.loadMultisigsOutputs(
-      participantIds,
-      threshold,
-      "unspent",
-      "",
-      []
-    );
-    let signed = await this.loadMultisigsOutputs(
-      participantIds,
-      threshold,
-      "signed",
-      "",
-      []
-    );
-    outputs.push(...signed);
-    let outputSet = {};
-    let assetSet = storage.getSelectedAssets();
-    let assetStateSet = {};
-    outputs.forEach(output => {
-      if (outputSet[output.utxo_id]) {
-        return;
-      }
-      if (!assetSet[output.asset_id]) {
-        assetSet[output.asset_id] = 0;
-      }
-      assetSet[output.asset_id] = new Decimal(
-        assetSet[output.asset_id]
-      ).plus(output.amount);
-      if (output.state === "signed") {
-        assetStateSet[output.asset_id] = output.state;
-      }
-      outputSet[output.utxo_id] = true;
-    });
-    let chains = await this.loadChains();
-    let assetIds = Object.keys(assetSet);
-    let assets = await this.loadAssets(assetIds, 0, []);
-    let balanceBTC = this.state.balanceBTC;
-    let balanceUSD = this.state.balanceUSD;
-    for (let i = 0; i < assets.length; i++) {
-      assets[i].state = assetStateSet[assets[i].asset_id] || "unspent";
-      assets[i].balance = new Decimal(assetSet[assets[i].asset_id]).toFixed();
-      assets[i].value = new Decimal(
-        new Decimal(assets[i].balance).times(assets[i].price_usd).toFixed(8)
-      ).toFixed();
-      assets[i].change_usd = new Decimal(assets[i].change_usd).toFixed(2);
-      assets[i].price_usd = new Decimal(assets[i].price_usd).toFixed();
-      if (new Decimal(assets[i].price_usd).cmp(1) > 0) {
-        assets[i].price_usd = new Decimal(
-          new Decimal(assets[i].price_usd).toFixed(2)
-        ).toFixed();
-      }
-      if (!chains[assets[i].chain_id]) {
-        chains = await this.loadChains(true);
-      }
-      assets[i].chain = chains[assets[i].chain_id];
-      balanceBTC = new Decimal(assets[i].balance)
-        .times(assets[i].price_btc)
-        .plus(balanceBTC);
-      balanceUSD = new Decimal(assets[i].value).plus(balanceUSD);
-    }
-    balanceBTC = balanceBTC.toFixed();
-    balanceUSD = balanceUSD.toFixed();
-    assets = assets.sort((a, b) => {
-      let value = new Decimal(a.value).cmp(b.value);
-      if (value !== 0) {
-        return -value;
-      }
-      let balance = new Decimal(a.balance).cmp(b.balance);
-      if (balance !== 0) {
-        return -balance;
-      }
-      return -new Decimal(a.price_usd).cmp(b.price_usd);
-    });
-    this.setState({
-      balanceBTC: balanceBTC,
-      balanceUSD: balanceUSD,
-      assets: assets,
-      participantsCount: participantIds.length,
-      threshold: threshold,
-      loading: false,
+    Promise.all([
+      this.loadMultisigsOutputs(
+        participantIds,
+        threshold,
+        "unspent",
+        "",
+        []
+      ),
+      this.loadMultisigsOutputs(
+        participantIds,
+        threshold,
+        "signed",
+        "",
+        []
+      ),
+      this.loadChains()
+    ]).then((values) => {
+      let outputs = values[0];
+      let signed = values[1];
+      let chains = values[2];
+
+      outputs.push(...signed);
+      let outputSet = {};
+      let assetSet = storage.getSelectedAssets();
+      let assetStateSet = {};
+      outputs.forEach(output => {
+        if (outputSet[output.utxo_id]) {
+          return;
+        }
+        if (!assetSet[output.asset_id]) {
+          assetSet[output.asset_id] = 0;
+        }
+        assetSet[output.asset_id] = new Decimal(
+          assetSet[output.asset_id]
+        ).plus(output.amount);
+        if (output.state === "signed") {
+          assetStateSet[output.asset_id] = output.state;
+        }
+        outputSet[output.utxo_id] = true;
+        let assetIds = Object.keys(assetSet);
+        this.loadAssets(assetIds, 0, []).then(assets => {
+          let balanceBTC = this.state.balanceBTC;
+          let balanceUSD = this.state.balanceUSD;
+          for (let i = 0; i < assets.length; i++) {
+            assets[i].state = assetStateSet[assets[i].asset_id] || "unspent";
+            assets[i].balance = new Decimal(assetSet[assets[i].asset_id]).toFixed();
+            assets[i].value = new Decimal(
+              new Decimal(assets[i].balance).times(assets[i].price_usd).toFixed(8)
+            ).toFixed();
+            assets[i].change_usd = new Decimal(assets[i].change_usd).toFixed(2);
+            assets[i].price_usd = new Decimal(assets[i].price_usd).toFixed();
+            if (new Decimal(assets[i].price_usd).cmp(1) > 0) {
+              assets[i].price_usd = new Decimal(
+                new Decimal(assets[i].price_usd).toFixed(2)
+              ).toFixed();
+            }
+            if (!chains[assets[i].chain_id]) {
+              this.loadChains(true);
+            }
+            assets[i].chain = chains[assets[i].chain_id];
+            balanceBTC = new Decimal(assets[i].balance)
+              .times(assets[i].price_btc)
+              .plus(balanceBTC);
+            balanceUSD = new Decimal(assets[i].value).plus(balanceUSD);
+          }
+          balanceBTC = balanceBTC.toFixed();
+          balanceUSD = balanceUSD.toFixed();
+          assets = assets.sort((a, b) => {
+            let value = new Decimal(a.value).cmp(b.value);
+            if (value !== 0) {
+              return -value;
+            }
+            let balance = new Decimal(a.balance).cmp(b.balance);
+            if (balance !== 0) {
+              return -balance;
+            }
+            return -new Decimal(a.price_usd).cmp(b.price_usd);
+          });
+          this.setState({
+            balanceBTC: balanceBTC,
+            balanceUSD: balanceUSD,
+            assets: assets,
+            participantsCount: participantIds.length,
+            threshold: threshold,
+            loading: false,
+          });
+        });
+      });
     });
   }
 

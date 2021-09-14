@@ -114,9 +114,15 @@ class Show extends Component {
     let code = await ApiGetCode(codeId);
     if (code.data && code.data.state === "signed") {
       let utxo = this.state.utxo;
+      utxo.threshold = code.data.threshold;
       utxo.signers = code.data.signers;
       utxo.signed_tx = code.data.raw_transaction;
-      this.setState({ home: true });
+      this.setState({
+        utxo: utxo,
+      });
+      if (utxo.signers.length > utxo.threshold) {
+        this.sendRawTransaction();
+      }
       return;
     }
     await this.sleep(1000);

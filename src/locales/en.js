@@ -67,7 +67,7 @@ const transfer = {
     card: {
       title: "Multisig Wallet",
       description: "From %{body}",
-      withdrawal: "Withdrawal %{amount}%{symbol} to %{user}",
+      withdrawal: "Withdrawal %{amount} %{symbol} to %{user}",
       icon_url:
       "https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
     },
