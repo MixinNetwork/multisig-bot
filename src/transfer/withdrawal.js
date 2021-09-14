@@ -13,6 +13,7 @@ import {
   ApiPostUsersFetch,
   ApiPostGhostKeys,
   ApiPostMultisigsRequests,
+  ApiPostExternalProxy,
   ApiGetCode,
 } from "../api";
 import util from "../api/util.js";
@@ -156,26 +157,33 @@ class Withdrawal extends Component {
   }
 
   async loadCode(codeId) {
+    let state = this.state;
     let code = await ApiGetCode(codeId);
     if (code.data && code.data.state === "signed") {
-      let description = window.i18n.t("transfer.card.withdrawal", {
-        amount: "",
-        symbol: "",
-        user: "",
-      });
-      let text = `https://multisig.mixin.zone/assets/${this.state.assetId}`;
-      let data = `{
+      if (code.data.signers.length < code.data.threshold) {
+        let description = window.i18n.t("transfer.card.withdrawal", {
+          amount: state.amount,
+          symbol: state.symbol,
+          user: state.user.full_name,
+        });
+        let text = `https://multisig.mixin.zone/assets/${this.state.assetId}`;
+        let data = `{
       "action": "${text}",
       "app_id": "${process.env.REACT_APP_CLIENT_ID}",
       "icon_url": "https://mixin-images.zeromesh.net/TZ04DRR2tAb7UTHYSzGW_ygMjXpHJnfQvSASFA7jC_biVLCqJBsucuNDg09jKL3nuMQPt6ZmUOabsN-ORnWit4Ml7QEpR9E0HTl1qQ=s256",
       "description": "${description.slice(0, 128)}",
       "title": "${window.i18n.t("transfer.card.title")}"
       }`;
-      window.open(
-        "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
-      );
-
-      this.setState({ back: true });
+        window.open(
+          "mixin://send?category=app_card&data=" + encodeURIComponent(Base64.encode(data))
+        );
+        this.setState({ back: true });
+      } else {
+        let resp = await ApiPostExternalProxy(code.data.raw_transaction);
+        if (!resp.error) {
+          this.setState({ back: true });
+        }
+      }
       return;
     }
     await this.sleep(1000);

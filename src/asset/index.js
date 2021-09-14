@@ -30,6 +30,7 @@ class Index extends Component {
       receive: false,
       send: false,
       loading: true,
+      requesting: true,
     };
 
     this.handleReceive = this.handleReceive.bind(this);
@@ -85,7 +86,7 @@ class Index extends Component {
       }
       let output = outputs.data[outputs.data.length - 1];
       if (output) {
-        offset = output.created_at;
+        offset = output.updated_at;
       }
     }
     this.loadMultisigsOutputs(participants, threshold, offset, utxo);
@@ -93,6 +94,17 @@ class Index extends Component {
 
   async loadFullData() {
     let that = this;
+
+    let chains = await that.loadChains();
+    let asset = await that.loadAsset();
+    asset.chain = chains[asset.chain_id];
+    asset.balance = "0";
+    asset.value = "0";
+    this.setState({
+      asset: asset,
+      loading: false,
+    });
+
     let conversation = await that.loadConversation();
     let participants = [];
     conversation.participants.forEach((p) => {
@@ -121,14 +133,15 @@ class Index extends Component {
       }
       return a;
     }, new Decimal("0"));
-    let chains = await that.loadChains();
-    let asset = await that.loadAsset();
     asset.balance = balance.toFixed();
     asset.value = new Decimal(
       balance.times(asset.price_usd).toFixed(8)
     ).toFixed();
-    asset.chain = chains[asset.chain_id];
-    this.setState({ asset: asset, outputs: transactions, loading: false });
+    this.setState({
+      asset: asset,
+      outputs: transactions,
+      requesting: false,
+    });
   }
 
   componentDidMount() {
@@ -223,7 +236,12 @@ class Index extends Component {
             </div>
           </div>
         </div>
-        {state.outputs.length === 0 && blank}
+        {state.outputs.length === 0 && !state.requesting && blank}
+        {state.outputs.length === 0 && state.requesting && (
+          <div className={styles.requesting}>
+            { i18n.t("loading") }
+          </div>
+        )}
         {state.outputs.length > 0 && transactions}
         {state.receive && (
           <Modal asset={state.asset} handleReceive={this.handleReceive} />

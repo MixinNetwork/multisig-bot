@@ -97,7 +97,13 @@ class Show extends Component {
       usersMap[users[i].user_id] = users[i];
     }
     let user = await this.loadUser()
-    this.setState({ utxo: utxo, asset: asset, users: usersMap, user: user, loading: false });
+    this.setState({
+      utxo: utxo,
+      asset: asset,
+      users: usersMap,
+      user: user,
+      loading: false,
+    });
   }
 
   sleep(ms) {
