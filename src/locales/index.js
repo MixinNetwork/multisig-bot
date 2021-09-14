@@ -11,6 +11,14 @@ class Locale {
   t(key, options) {
     return this.polyglot.t(key, options);
   }
+
+  tt() {
+    var that = this;
+    function t(key, options) {
+      return that.polyglot.t(key, options);
+    }
+    return t;
+  }
 }
 
 export default Locale;

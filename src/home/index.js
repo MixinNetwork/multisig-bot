@@ -42,13 +42,17 @@ class Index extends Component {
 
   async loadFullData() {
     let conversation = await this.loadConversation();
+    let threshold = util.parseThreshold(conversation.name);
     if (
       !conversation ||
       conversation.category !== "GROUP" ||
-      util.parseThreshold(conversation.name) < 1 ||
+      threshold < 1 ||
       conversation.participants.length < 3
     ) {
-      this.setState({ loading: false, guide: true });
+      this.setState({
+        loading: false,
+        guide: true,
+      });
       return;
     }
     let participantIds = [];
@@ -56,36 +60,46 @@ class Index extends Component {
       // skip current and old multisig bot
       if (
         process.env.REACT_APP_CLIENT_ID !== p.user_id &&
-        "37e040ec-df91-47a7-982e-0e118932fa8b" !== p.user_id
+        "37e040ec-df91-47a7-982e-0e118932fa8b" !== p.user_id // development bot id
       ) {
         participantIds.push(p.user_id);
       }
     });
+    this.setState({
+      participantsCount: participantIds.length,
+      threshold: threshold,
+      loading: false,
+    });
     // multisig output assets will always display
     let outputs = await this.loadMultisigsOutputs(
       participantIds,
-      util.parseThreshold(conversation.name),
+      threshold,
       "unspent",
       "",
       []
     );
     let signed = await this.loadMultisigsOutputs(
       participantIds,
-      util.parseThreshold(conversation.name),
+      threshold,
       "signed",
       "",
       []
     );
     outputs.push(...signed);
+    let outputSet = {};
     let assetSet = storage.getSelectedAssets();
-    for (let i = 0; i < outputs.length; i++) {
-      if (!assetSet[outputs[i].asset_id]) {
-        assetSet[outputs[i].asset_id] = 0;
+    outputs.forEach(output => {
+      if (outputSet[output.utxo_id]) {
+        return;
       }
-      assetSet[outputs[i].asset_id] = new Decimal(
-        assetSet[outputs[i].asset_id]
-      ).plus(outputs[i].amount);
-    }
+      if (!assetSet[output.asset_id]) {
+        assetSet[output.asset_id] = 0;
+      }
+      assetSet[output.asset_id] = new Decimal(
+        assetSet[output.asset_id]
+      ).plus(output.amount);
+      outputSet[output.utxo_id] = true;
+    });
     let chains = await this.loadChains();
     let assetIds = Object.keys(assetSet);
     let assets = await this.loadAssets(assetIds, 0, []);
@@ -103,6 +117,9 @@ class Index extends Component {
           new Decimal(assets[i].price_usd).toFixed(2)
         ).toFixed();
       }
+      if (!chains[assets[i].chain_id]) {
+        chains = await this.loadChains(true);
+      }
       assets[i].chain = chains[assets[i].chain_id];
       balanceBTC = new Decimal(assets[i].balance)
         .times(assets[i].price_btc)
@@ -116,6 +133,10 @@ class Index extends Component {
       if (value !== 0) {
         return -value;
       }
+      let balance = new Decimal(a.balance).cmp(b.balance);
+      if (balance !== 0) {
+        return -balance;
+      }
       return -new Decimal(a.price_usd).cmp(b.price_usd);
     });
     this.setState({
@@ -123,10 +144,11 @@ class Index extends Component {
       balanceUSD: balanceUSD,
       assets: assets,
       participantsCount: participantIds.length,
-      threshold: util.parseThreshold(conversation.name),
+      threshold: threshold,
       loading: false,
     });
   }
+
   async loadConversation() {
     let conversation = await ApiGetConversation(mixin.util.conversationId());
     if (conversation.data) {
@@ -137,6 +159,7 @@ class Index extends Component {
     }
     return this.loadConversation();
   }
+
   async loadMultisigsOutputs(participants, threshold, state, offset, utxo) {
     let outputs = await ApiGetMultisigsOutputs(
       participants,
@@ -151,18 +174,20 @@ class Index extends Component {
       }
       let output = outputs.data[outputs.data.length - 1];
       if (output) {
-        offset = output.created_at;
+        offset = output.updated_at;
       }
     }
     this.loadMultisigsOutputs(participants, threshold, offset, utxo);
   }
-  async loadChains() {
-    let chains = await ApiGetChains();
+
+  async loadChains(force=false) {
+    let chains = await ApiGetChains(force);
     if (!chains.error) {
       return chains;
     }
     return this.loadChains();
   }
+
   async loadAssets(ids, offset, output) {
     if (ids.length === offset) {
       return output;
@@ -186,7 +211,7 @@ class Index extends Component {
   }
 
   render() {
-    const i18n = window.i18n;
+    let t = window.i18n.tt();
     let state = this.state;
 
     if (state.loading) {
@@ -226,7 +251,7 @@ class Index extends Component {
         className={styles.home}
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header to="/" icon="disable" name={i18n.t('home.header.title', { text: `${state.threshold}/${state.participantsCount}`})} />
+        <Header to="/" icon="disable" name={t('home.header.title', { text: `${state.threshold}/${state.participantsCount}`})} />
         <div className={styles.balance}>
           <div className={styles.btc}>
             {state.balanceBTC} <span>BTC</span>
@@ -235,11 +260,14 @@ class Index extends Component {
         </div>
         <div className={styles.main}>
           <header>
-            <div className={styles.title}>{i18n.t("home.assets")}</div>
+            <div className={styles.title}>{t("home.assets")}</div>
             <SettingIcon onClick={() => this.handleModal(true)} />
           </header>
           <main>
-            <ul>{assets}</ul>
+            {state.assets.length === 0 && <div className={styles.loading}>
+              {t("loading")}
+            </div>}
+            {state.assets.length > 0 && <ul>{assets}</ul>}
           </main>
         </div>
         {state.modal && <Modal handleModal={this.handleModal} />}

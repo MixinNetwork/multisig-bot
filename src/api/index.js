@@ -3,14 +3,14 @@ import mixin from "bot-api-js-client";
 import client from "./client";
 import storage from "./storage";
 
-export const ApiGetChains = () => {
-  let chains = storage.getChains();
-  let at = storage.getChainsUpdatedAt();
-  // cache 1 day chains
-  if (chains && at && new Date() - new Date(at) < 24 * 60 * 60 * 1000) {
-    return new Promise((resolve) => {
-      resolve(JSON.parse(chains));
-    });
+export const ApiGetChains = (force) => {
+  if (!force) {
+    let chains = storage.getChains();
+    if (chains) {
+      return new Promise((resolve) => {
+        resolve(JSON.parse(chains));
+      });
+    }
   }
 
   return client.requestByToken("GET", "/network/chains", "").then((resp) => {
@@ -22,11 +22,11 @@ export const ApiGetChains = () => {
     resp.data.forEach((chain) => {
       chainMap[chain.chain_id] = chain;
     });
-    storage.setChainsUpdatedAt();
     storage.setChains(chainMap);
     return chainMap;
   });
 };
+
 export const ApiGetMultisigAssets = () => {
   return client.requestByToken("GET", "/network/assets/multisig", "");
 };
