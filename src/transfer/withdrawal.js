@@ -61,6 +61,13 @@ class Withdrawal extends Component {
     this.setState(state);
   }
 
+  fullName = (u) => {
+    if (u.full_name) {
+      return u.full_name.trim().slice(0, 18);
+    }
+    return ""
+  }
+
   toHex(s) {
     if (typeof(s) !== 'string') {
       return '';
@@ -255,6 +262,7 @@ class Withdrawal extends Component {
 
   async loadFullData() {
     let that = this;
+
     let conversation = await that.loadConversation();
     let participants = [];
     conversation.participants.forEach((p) => {
@@ -265,6 +273,20 @@ class Withdrawal extends Component {
         participants.push(p.user_id);
       }
     });
+    let chains = await that.loadChains();
+    let asset = await that.loadAsset();
+    asset.chain = chains[asset.chain_id];
+    asset.balance = "0";
+    this.setState({
+      conversation: conversation,
+      asset: asset,
+      loading: false,
+    });
+
+    let users = await that.loadUsers();
+    if (users.length < 1) {
+      return
+    }
     let outputs = await that.loadMultisigsOutputs(
       participants,
       util.parseThreshold(conversation.name),
@@ -277,14 +299,7 @@ class Withdrawal extends Component {
       }
       return a;
     }, new Decimal("0"));
-    let chains = await that.loadChains();
-    let asset = await that.loadAsset();
     asset.balance = balance.toFixed();
-    asset.chain = chains[asset.chain_id];
-    let users = await that.loadUsers();
-    if (users.length < 1) {
-      return
-    }
     this.setState({
       conversation: conversation,
       asset: asset,
@@ -315,7 +330,7 @@ class Withdrawal extends Component {
         className={ styles.withdrawal }
         style={{ backgroundImage: `url(${background})` }}
       >
-        <Header to='/' name={ i18n.t('transfer.header.withdrawal', { name: state.user.full_name.trim().slice(0, 18) }) } />
+        <Header to='/' name={ i18n.t('transfer.header.withdrawal', { name: this.fullName(state.user) }) } />
         <main>
           <div className={styles.icon}>
             <AssetIcon asset={state.asset} />
