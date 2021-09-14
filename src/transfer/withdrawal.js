@@ -170,7 +170,7 @@ class Withdrawal extends Component {
       if (code.data.signers.length < code.data.threshold) {
         let description = window.i18n.t("transfer.card.withdrawal", {
           amount: state.amount,
-          symbol: state.symbol,
+          symbol: state.asset.symbol,
           user: state.user.full_name,
         });
         let text = `https://multisig.mixin.zone/assets/${this.state.assetId}`;
