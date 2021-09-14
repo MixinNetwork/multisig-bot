@@ -88,6 +88,7 @@ class Index extends Component {
     outputs.push(...signed);
     let outputSet = {};
     let assetSet = storage.getSelectedAssets();
+    let assetStateSet = {};
     outputs.forEach(output => {
       if (outputSet[output.utxo_id]) {
         return;
@@ -98,6 +99,9 @@ class Index extends Component {
       assetSet[output.asset_id] = new Decimal(
         assetSet[output.asset_id]
       ).plus(output.amount);
+      if (output.state === "signed") {
+        assetStateSet[output.asset_id] = output.state;
+      }
       outputSet[output.utxo_id] = true;
     });
     let chains = await this.loadChains();
@@ -106,6 +110,7 @@ class Index extends Component {
     let balanceBTC = this.state.balanceBTC;
     let balanceUSD = this.state.balanceUSD;
     for (let i = 0; i < assets.length; i++) {
+      assets[i].state = assetStateSet[assets[i].asset_id] || "unspent";
       assets[i].balance = new Decimal(assetSet[assets[i].asset_id]).toFixed();
       assets[i].value = new Decimal(
         new Decimal(assets[i].balance).times(assets[i].price_usd).toFixed(8)
@@ -229,6 +234,7 @@ class Index extends Component {
             <AssetIcon asset={asset} />
             <div className={styles.info}>
               {asset.balance} {asset.symbol}
+              { asset.state === 'signed' && <span> (OTW) </span> }
               <div className={styles.price}>≈ ${asset.value}</div>
             </div>
             <div className={styles.value}>
