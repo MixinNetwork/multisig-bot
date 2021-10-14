@@ -111,53 +111,56 @@ class Index extends Component {
           assetStateSet[output.asset_id] = output.state;
         }
         outputSet[output.utxo_id] = true;
-        let assetIds = Object.keys(assetSet);
-        this.loadAssets(assetIds, 0, []).then(assets => {
-          let balanceBTC = this.state.balanceBTC;
-          let balanceUSD = this.state.balanceUSD;
-          for (let i = 0; i < assets.length; i++) {
-            assets[i].state = assetStateSet[assets[i].asset_id] || "unspent";
-            assets[i].balance = new Decimal(assetSet[assets[i].asset_id]).toFixed();
-            assets[i].value = new Decimal(
-              new Decimal(assets[i].balance).times(assets[i].price_usd).toFixed(8)
+      });
+
+      let assetIds = Object.keys(assetSet);
+      this.loadAssets(assetIds, 0, []).then(assets => {
+        let balanceBTC = this.state.balanceBTC;
+        let balanceUSD = this.state.balanceUSD;
+        for (let i = 0; i < assets.length; i++) {
+          assets[i].state = assetStateSet[assets[i].asset_id] || "unspent";
+          assets[i].balance = new Decimal(assetSet[assets[i].asset_id]).toFixed();
+          assets[i].value = new Decimal(
+            new Decimal(assets[i].balance).times(assets[i].price_usd).toFixed(8)
+          ).toFixed();
+          assets[i].change_usd = new Decimal(assets[i].change_usd).toFixed(2);
+          assets[i].price_usd = new Decimal(assets[i].price_usd).toFixed();
+          if (new Decimal(assets[i].price_usd).cmp(1) > 0) {
+            assets[i].price_usd = new Decimal(
+              new Decimal(assets[i].price_usd).toFixed(2)
             ).toFixed();
-            assets[i].change_usd = new Decimal(assets[i].change_usd).toFixed(2);
-            assets[i].price_usd = new Decimal(assets[i].price_usd).toFixed();
-            if (new Decimal(assets[i].price_usd).cmp(1) > 0) {
-              assets[i].price_usd = new Decimal(
-                new Decimal(assets[i].price_usd).toFixed(2)
-              ).toFixed();
-            }
-            if (!chains[assets[i].chain_id]) {
-              this.loadChains(true);
-            }
-            assets[i].chain = chains[assets[i].chain_id];
-            balanceBTC = new Decimal(assets[i].balance)
-              .times(assets[i].price_btc)
-              .plus(balanceBTC);
-            balanceUSD = new Decimal(assets[i].value).plus(balanceUSD);
           }
-          balanceBTC = balanceBTC.toFixed();
-          balanceUSD = balanceUSD.toFixed();
-          assets = assets.sort((a, b) => {
-            let value = new Decimal(a.value).cmp(b.value);
-            if (value !== 0) {
-              return -value;
-            }
-            let balance = new Decimal(a.balance).cmp(b.balance);
-            if (balance !== 0) {
-              return -balance;
-            }
-            return -new Decimal(a.price_usd).cmp(b.price_usd);
-          });
-          this.setState({
-            balanceBTC: balanceBTC,
-            balanceUSD: balanceUSD,
-            assets: assets,
-            participantsCount: participantIds.length,
-            threshold: threshold,
-            loading: false,
-          });
+          if (!chains[assets[i].chain_id]) {
+            this.loadChains(true);
+          }
+          assets[i].chain = chains[assets[i].chain_id];
+          balanceBTC = new Decimal(assets[i].balance)
+            .times(assets[i].price_btc)
+            .plus(balanceBTC);
+          balanceUSD = new Decimal(assets[i].value).plus(balanceUSD);
+        }
+        balanceBTC = balanceBTC.toFixed(8);
+        balanceBTC = new Decimal(balanceBTC).toFixed();
+        balanceUSD = balanceUSD.toFixed(2);
+        balanceUSD = new Decimal(balanceUSD).toFixed();
+        assets = assets.sort((a, b) => {
+          let value = new Decimal(a.value).cmp(b.value);
+          if (value !== 0) {
+            return -value;
+          }
+          let balance = new Decimal(a.balance).cmp(b.balance);
+          if (balance !== 0) {
+            return -balance;
+          }
+          return -new Decimal(a.price_usd).cmp(b.price_usd);
+        });
+        this.setState({
+          balanceBTC: balanceBTC,
+          balanceUSD: balanceUSD,
+          assets: assets,
+          participantsCount: participantIds.length,
+          threshold: threshold,
+          loading: false,
         });
       });
     });
