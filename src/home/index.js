@@ -272,27 +272,37 @@ Home.prototype = {
           alert('TOO MUCH');
           return;
         }
-        self.loadGhostKeys(members, 0, function (output) {
+        var ghostRequests = [{
+          receivers: members,
+          index: 0
+        }, {
+          receivers: utxo.members,
+          index: 1
+        }];
+        console.log(ghostRequests);
+        self.loadGhostKeys(ghostRequests, function (keysData) {
+          console.log(keysData);
+          var output = {
+            mask: keysData[0].mask,
+            keys: keysData[0].keys
+          };
           output.amount = amount.toString();
           output.script = self.buildThresholdScript(parseInt($('input[name="threshold"]').val()));
           tx.outputs.push(output)
           if (inputAmount.cmp(amount) > 0) {
+            var output = {
+              mask: keysData[1].mask,
+              keys: keysData[1].keys
+            };
             var utxo = utxos[Object.keys(utxos)[0]];
-            self.loadGhostKeys(utxo.members, 1, function(output) {
-              output.amount = inputAmount.sub(amount).toString();
-              output.script = self.buildThresholdScript(utxo.threshold);
-              tx.outputs.push(output)
-              console.log(JSON.stringify(tx));
-              var raw = mixinGo.buildTransaction(JSON.stringify(tx));
-              console.log(raw);
-              self.handleMultisigRequest(raw, 'sign');
-            });
-          } else {
-            console.log(JSON.stringify(tx));
-            var raw = mixinGo.buildTransaction(JSON.stringify(tx));
-            console.log(raw);
-            self.handleMultisigRequest(raw, 'sign');
+            output.amount = inputAmount.sub(amount).toString();
+            output.script = self.buildThresholdScript(utxo.threshold);
+            tx.outputs.push(output)
           }
+          console.log(JSON.stringify(tx));
+          var raw = mixinGo.buildTransaction(JSON.stringify(tx));
+          console.log(raw);
+          self.handleMultisigRequest(raw, 'sign');
         });
       });
       $('input[type=submit]').click(function (event) {
@@ -351,7 +361,7 @@ Home.prototype = {
   },
 
   createMultisigRequest: function(raw, action, callback) {
-    this.api.request('POST', '/multisigs', {raw: raw, action: action}, function (resp) {
+    this.api.request('POST', '/multisigs/requests', {raw: raw, action: action}, function (resp) {
       if (resp.error) {
         return;
       }
@@ -359,16 +369,12 @@ Home.prototype = {
     });
   },
 
-  loadGhostKeys: function(members, index, callback) {
-    this.api.request('POST', '/outputs', {receivers: members, index: index}, function (resp) {
+  loadGhostKeys: function(ghosts, callback) {
+    this.api.request('POST', '/outputs', ghosts, function (resp) {
       if (resp.error) {
         return;
       }
-      var keys = {
-        mask: resp.data.mask,
-        keys: resp.data.keys
-      };
-      callback(keys);
+      callback(resp.data);
     });
   },
 
@@ -387,6 +393,9 @@ Home.prototype = {
           continue;
         }
         if (utxo.threshold !== threshold) {
+          continue;
+        }
+        if (utxo.state === 'spent') {
           continue;
         }
         if (!filter[utxo.asset_id]) {

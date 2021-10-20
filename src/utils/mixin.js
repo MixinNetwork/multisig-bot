@@ -13,7 +13,6 @@ Mixin.prototype = {
   },
 
   conversationId: function () {
-    return "03db3b29-793c-4cf6-a3bd-7c583630cbb3";
     switch (this.environment()) {
       case 'iOS':
         var ctx = prompt('MixinContext.getContext()');

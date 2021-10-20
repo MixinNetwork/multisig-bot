@@ -15,11 +15,8 @@ const api = new API(router, API_ROOT);
 
 window.i18n = new Locale(navigator.language);
 
-router.replace = function(url) {
-  this.resolve(url);
-  this.pause(true);
+router.replace = function (url) {
   this.navigate(url);
-  this.pause(false);
 };
 
 router.hooks({
