@@ -1,21 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
 const WebappWebpackPlugin = require('favicons-webpack-plugin');
 
-const extractSass = new ExtractTextPlugin({
-    filename: "[name]-[hash].css"
-});
-
-const webRoot = function (env) {
-  if (env === 'production') {
-    return 'https://multisig.vec.io';
-  } else {
-    return 'http://multisig.local';
-  }
-};
+const devMode = process.env.NODE_ENV !== 'production';
 
 const apiRoot = function (env) {
   if (env === 'production') {
@@ -25,11 +15,11 @@ const apiRoot = function (env) {
   }
 };
 
-const clientId = function (env) {
+const blazeRoot = function (env) {
   if (env === 'production') {
-    return '37e040ec-df91-47a7-982e-0e118932fa8b';
+    return 'wss://mixin-blaze.zeromesh.net';
   } else {
-    return '37e040ec-df91-47a7-982e-0e118932fa8b';
+    return 'wss://mixin-blaze.zeromesh.net';
   }
 };
 
@@ -41,7 +31,7 @@ module.exports = {
   output: {
     publicPath: '/assets/',
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[chunkHash].js'
+    filename: '[name]-[hash].js'
   },
 
   resolve: {
@@ -53,62 +43,51 @@ module.exports = {
 
   module: {
     rules: [{
-      test: /\.html$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/helpers"
+      test: /\.html$/,
+      use: ["handlebars-loader?helperDirs[]=" + __dirname + "/src/helpers"]
     }, {
       test: /\.(scss|css)$/,
-      use: extractSass.extract({
-        use: [{
-          loader: "css-loader"
-        }, {
-          loader: "sass-loader"
-        }],
-        fallback: "style-loader"
-      })
-    }, {
-      test: /\.(woff|woff2|eot|ttf|otf|svg)$/i,
-      loader: 'file-loader',
-      options: {
-        name(file) {
-          if (process.env.NODE_ENV === 'development') {
-            return '[path][name].[ext]';
-          }
-          return '[hash].[ext]';
+      use: [
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            esModule: true
+          },
         },
-        emitFile: true
-      },
+        'css-loader',
+        'sass-loader',
+      ]
     }, {
-      test: /\.(png|svg|jpe?g|gif)$/i,
-      loader: 'file-loader',
-      options: {
-        name(file) {
-          if (process.env.NODE_ENV === 'development') {
-            return '[path][name].[ext]';
-          }
-          return '[hash].[ext]';
-        },
-        emitFile: true
-      },
+      test: /\.(woff|woff2|eot|ttf|otf|svg|png|jpg|gif)$/,
+      use: [
+        'file-loader'
+      ]
     }]
   },
 
   plugins: [
     new webpack.DefinePlugin({
       PRODUCTION: (process.env.NODE_ENV === 'production'),
-      WEB_ROOT: JSON.stringify(webRoot(process.env.NODE_ENV)),
       API_ROOT: JSON.stringify(apiRoot(process.env.NODE_ENV)),
-      CLIENT_ID: JSON.stringify(clientId(process.env.NODE_ENV)),
-      APP_NAME: JSON.stringify('Multisig Wallet')
+      BLAZE_ROOT: JSON.stringify(blazeRoot(process.env.NODE_ENV)),
+      APP_NAME: JSON.stringify('Mixin')
     }),
     new HtmlWebpackPlugin({
       template: './src/layout.html'
     }),
     new WebappWebpackPlugin({
       logo: './src/launcher.png',
-      prefix: 'icons-[hash]-'
+      prefix: 'icons/'
     }),
     new ScriptExtHtmlWebpackPlugin({
       defaultAttribute: 'async'
     }),
-    extractSass
+    new MiniCssExtractPlugin({
+      filename: devMode ? '[name].css' : '[name]-[hash].css',
+      chunkFilename: devMode ? '[id].css' : '[id]-[hash].css',
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"]
+    })
   ]
 };

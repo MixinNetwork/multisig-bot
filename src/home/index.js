@@ -1,6 +1,6 @@
 import './index.scss';
 import $ from 'jquery';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import Decimal from 'decimal.js';
 import Mixin from '../utils/mixin.js';
 import FormUtils from '../utils/form.js';
