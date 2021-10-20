@@ -302,7 +302,7 @@ Home.prototype = {
         if (!filter[utxo.token_id]) {
           filter[utxo.token_id] = {};
         }
-        filter[utxo.token_id][utxo.utxo_id] = utxo;
+        filter[utxo.token_id][utxo.output_id] = utxo;
       }
       if (resp.data.length < 100) {
         return callback(filter);
