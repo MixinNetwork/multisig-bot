@@ -26,31 +26,13 @@ Home.prototype = {
         || resp.data && self.parseThreshold(resp.data.name) < 1
         || resp.data && resp.data.participants.length < 3) {
         var members = [self.api.account.me().user_id];
-        self.loadUTXOs(undefined, members, 1, {}, function (utxos) {
-          if (Object.keys(utxos).length == 0) {
-            $('body').attr('class', 'home layout');
-            $('#layout-container').html(self.templateEmpty());
-          } else {
-            self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
-              self.renderWalletForAll(resp.data, users, assets, utxos);
-            });
-          }
-        });
+        self.loadWallet(members, 1);
         return true;
       } else if (resp.data && resp.data.category === 'GROUP') {
         self.loadUsers(resp.data.participants, function (users) {
           var members = self.memberIds(conv.participants);
           var threshold = self.parseThreshold(conv.name);
-          self.loadUTXOs(undefined, members, threshold, {}, function (utxos) {
-            if (Object.keys(utxos).length == 0) {
-              $('body').attr('class', 'home layout');
-              $('#layout-container').html(self.templateEmpty());
-            } else {
-              self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
-                self.renderWalletForAll(resp.data, users, assets, utxos);
-              });
-            }
-          });
+          self.loadWallet(members, threshold);
         });
         return true;
       }
@@ -58,22 +40,36 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
-  renderWalletForAll: function (conv, users, assets, utxos) {
+  loadWallet: function (members, threshold) {
+    const self = this;
+    self.loadUTXOs(undefined, members, threshold, {}, function (utxos) {
+      if (Object.keys(utxos).length == 0) {
+        $('body').attr('class', 'home layout');
+        $('#layout-container').html(self.templateEmpty());
+      } else {
+        self.loadTokens(0, Object.keys(utxos), {}, function (tokens) {
+          self.renderWalletForAll(tokens, utxos);
+        });
+      }
+    });
+  },
+
+  renderWalletForAll: function (tokens, utxos) {
     const self = this;
     var assetsView = [];
     for (var id in utxos) {
-      var item = self.buildAssetItem(assets[id], utxos[id]);
+      var item = self.buildTokenItem(tokens[id], utxos[id]);
       assetsView.push(item);
     }
     $('body').attr('class', 'home layout');
-    $('#layout-container').html(self.templateIndex({assets: assetsView}));
+    $('#layout-container').html(self.templateIndex({tokens: assetsView}));
     $('.assets.list .wallet.item').on('click', function (e) {
       e.preventDefault();
       var id = $(this).attr('data-id');
       $('body').attr('class', 'loading layout');
       $('#layout-container').html(self.partialLoading());
       self.loadContacts(function (contacts) {
-        self.renderWalletForAsset(assets[id], utxos[id], contacts);
+        self.renderWalletForAsset(tokens[id], utxos[id], contacts);
       });
     });
   },
@@ -115,7 +111,7 @@ Home.prototype = {
           multi.receivers = receivers;
           multi.signers = signers;
           multi.asset = asset;
-          multi.finished = signers.length >= utxo.threshold;
+          multi.finished = signers.length >= utxo.receivers_threshold;
           console.log(multi);
           $('body').attr('class', 'home layout');
           $('#layout-container').html(self.templateSign(multi));
@@ -124,7 +120,7 @@ Home.prototype = {
           });
           $('form').submit(function (event) {
             event.preventDefault();
-            if (multi.signers.length < utxo.threshold) {
+            if (multi.signers.length < utxo.receivers_threshold) {
               setTimeout(function() { self.waitForAction(multi.code_id); }, 1500);
               window.location.replace('mixin://codes/' + multi.code_id);
               return;
@@ -153,7 +149,7 @@ Home.prototype = {
       $('form').submit(function (event) {
         event.preventDefault();
         var members = [];
-        $('input:radio:checked').each(function () {
+        $('input:checkbox:checked').each(function () {
           members.push($(this).val());
         });
         var tx = {
@@ -183,7 +179,7 @@ Home.prototype = {
           receivers: members,
           index: 0
         }, {
-          receivers: utxo.members,
+          receivers: utxo.receivers,
           index: 1
         }];
         console.log(ghostRequests);
@@ -203,7 +199,7 @@ Home.prototype = {
             };
             var utxo = utxos[Object.keys(utxos)[0]];
             output.amount = inputAmount.sub(amount).toString();
-            output.script = self.buildThresholdScript(utxo.threshold);
+            output.script = self.buildThresholdScript(utxo.receivers_threshold);
             tx.outputs.push(output)
           }
           console.log(JSON.stringify(tx));
@@ -242,7 +238,7 @@ Home.prototype = {
     });
   },
 
-  buildAssetItem: function (asset, utxos) {
+  buildTokenItem: function (asset, utxos) {
     var total = new Decimal(0), signed = new Decimal(0), pending = new Decimal(0);
     for (var id in utxos) {
       total = total.add(new Decimal(utxos[id].amount));
@@ -294,19 +290,19 @@ Home.prototype = {
       }
       for (var i in resp.data) {
         var utxo = resp.data[i];
-        if (utxo.members.sort().join("") !== key) {
+        if (utxo.receivers.sort().join("") !== key) {
           continue;
         }
-        if (utxo.threshold !== threshold) {
+        if (utxo.receivers_threshold !== threshold) {
           continue;
         }
         if (utxo.state === 'spent') {
           continue;
         }
-        if (!filter[utxo.asset_id]) {
-          filter[utxo.asset_id] = {};
+        if (!filter[utxo.token_id]) {
+          filter[utxo.token_id] = {};
         }
-        filter[utxo.asset_id][utxo.utxo_id] = utxo;
+        filter[utxo.token_id][utxo.utxo_id] = utxo;
       }
       if (resp.data.length < 100) {
         return callback(filter);
@@ -346,23 +342,23 @@ Home.prototype = {
     }
   },
 
-  loadAssets: function (offset, ids, output, callback) {
+  loadTokens: function (offset, ids, output, callback) {
     const self = this;
     const key = ids.sort().join('');
-    var assets = localStorage.getItem(key);
-    if (assets) {
-      return callback(JSON.parse(assets));
+    var tokens = localStorage.getItem(key);
+    if (tokens) {
+      return callback(JSON.parse(tokens));
     }
     if (offset === ids.length) {
       localStorage.setItem(key, JSON.stringify(output));
       return callback(output);
     }
-    self.api.request('GET', '/assets/' + ids[offset], undefined, function (resp) {
+    self.api.request('GET', '/collectibles/tokens/' + ids[offset], undefined, function (resp) {
       if (resp.error) {
         return false;
       }
-      output[resp.data.asset_id] = resp.data;
-      self.loadAssets(offset+1, ids, output, callback);
+      output[resp.data.token_id] = resp.data;
+      self.loadTokens(offset+1, ids, output, callback);
     });
   },
 
@@ -404,18 +400,6 @@ Home.prototype = {
     }
     var t = parseInt(parts[1]);
     return t ? t : -1;
-  },
-
-  makeUnique: function (ps) {
-    var ids = [];
-    for (var i in ps) {
-      var id = ps[i].user_id;
-      if (id === CLIENT_ID) {
-        continue;
-      }
-      ids.push(ps[i].user_id)
-    }
-    return ids.sort().join('');
   },
 
   memberIds: function (ps) {

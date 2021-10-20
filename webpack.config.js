@@ -17,9 +17,9 @@ const apiRoot = function (env) {
 
 const clientId = function (env) {
   if (env === 'production') {
-    return '37e040ec-df91-47a7-982e-0e118932fa8b';
+    return '037ba0df-afbf-4491-8053-62c7a3957d7b';
   } else {
-    return '37e040ec-df91-47a7-982e-0e118932fa8b';
+    return '037ba0df-afbf-4491-8053-62c7a3957d7b';
   }
 };
 

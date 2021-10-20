@@ -2,8 +2,8 @@
   <fieldset>
     {{#each contacts}}
     <div class="field user">
-      <input type="radio" name="receiver" id="radio-{{user_id}}" value="{{user_id}}">
-      <label for="radio-{{user_id}}">
+      <input type="checkbox" name="checkbox-{{user_id}}" id="checkbox-{{user_id}}" value="{{user_id}}">
+      <label for="checkbox-{{user_id}}">
         <div class="user avatar">
           {{#if firstLetter}}
           <p>{{firstLetter}}</p>
@@ -19,18 +19,21 @@
     </div>
     {{/each}}
     <div class="field">
-      <label for="amount">Amount ({{asset.symbol}})</label>
-      <input type="number" step="0.00000001" name="amount" />
+      <label for="threshold">Threshold</label>
+      <input type="number" name="threshold" />
+    </div>
+    <div class="field">
+      <label for="amount">Amount (#{{asset.token}})</label>
+      <input type="number" step="1" name="amount" />
     </div>
     <div class="field">
       <label for="memo">Memo</label>
       <input type="text" name="memo" />
     </div>
     <div class="field">
-      <input type="submit" value="Send {{asset.symbol}}" />
+      <input type="submit" value="Send {{asset.meta.name}}" />
     </div>
-    <input type="hidden" value="{{asset.asset_id}}" name="asset_id" />
-      <input type="hidden" value="1" name="threshold" />
+    <input type="hidden" value="{{asset.token_id}}" name="token_id" />
   </fieldset>
 </form>
 
