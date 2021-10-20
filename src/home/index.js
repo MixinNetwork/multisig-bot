@@ -375,6 +375,7 @@ Home.prototype = {
   loadUTXOs: function (offset, conv, filter, callback) {
     const self = this;
     var key = self.makeUnique(conv.participants);
+    var members = self.memberIds(conv.participants);
     var threshold = self.parseThreshold(conv.name);
     self.api.multisig.list(function (resp) {
       if (resp.error) {
@@ -397,7 +398,7 @@ Home.prototype = {
         return callback(filter);
       }
       self.loadUTXOs(resp.data[resp.data.length-1].created_at, conv, filter, callback);
-    }, offset, 100);
+    }, members, threshold, offset, 100);
   },
 
   loadContacts: function (callback) {
@@ -501,6 +502,18 @@ Home.prototype = {
       ids.push(ps[i].user_id)
     }
     return ids.sort().join('');
+  },
+
+  memberIds: function (ps) {
+    var ids = [];
+    for (var i in ps) {
+      var id = ps[i].user_id;
+      if (id === CLIENT_ID) {
+        continue;
+      }
+      ids.push(ps[i].user_id)
+    }
+    return ids.sort();
   },
 
   toHex: function(s) {

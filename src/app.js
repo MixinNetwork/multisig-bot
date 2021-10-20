@@ -7,9 +7,10 @@ import API from './api';
 import Home from './home';
 import Auth from './auth';
 
+const WEB_ROOT = location.protocol + '//' + location.host;
 const PartialLoading = require('./loading.html');
 const Error404 = require('./404.html');
-const router = new Navigo(WEB_ROOT);
+const router = new Navigo('/');
 const api = new API(router, API_ROOT);
 
 window.i18n = new Locale(navigator.language);

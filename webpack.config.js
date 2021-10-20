@@ -15,11 +15,11 @@ const apiRoot = function (env) {
   }
 };
 
-const blazeRoot = function (env) {
+const clientId = function (env) {
   if (env === 'production') {
-    return 'wss://mixin-blaze.zeromesh.net';
+    return '37e040ec-df91-47a7-982e-0e118932fa8b';
   } else {
-    return 'wss://mixin-blaze.zeromesh.net';
+    return '37e040ec-df91-47a7-982e-0e118932fa8b';
   }
 };
 
@@ -69,8 +69,8 @@ module.exports = {
     new webpack.DefinePlugin({
       PRODUCTION: (process.env.NODE_ENV === 'production'),
       API_ROOT: JSON.stringify(apiRoot(process.env.NODE_ENV)),
-      BLAZE_ROOT: JSON.stringify(blazeRoot(process.env.NODE_ENV)),
-      APP_NAME: JSON.stringify('Mixin')
+      CLIENT_ID: JSON.stringify(clientId(process.env.NODE_ENV)),
+      APP_NAME: JSON.stringify('Multisig Wallet')
     }),
     new HtmlWebpackPlugin({
       template: './src/layout.html'

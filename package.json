@@ -17,6 +17,7 @@
     "pako": "^2.0.3",
     "qrious": "^4.0.2",
     "reconnecting-websocket": "^4.4.0",
+    "sha3": "^2.1.4",
     "simple-line-icons": "^2.5.5",
     "slick-carousel": "^1.8.1",
     "three": "^0.130.0",
@@ -39,9 +40,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode development",
-    "watch": "webpack -w --mode development",
-    "dist": "NODE_ENV=production webpack -p --mode production"
+    "build": "webpack --mode=development",
+    "watch": "webpack -w --mode=development",
+    "dist": "NODE_ENV=production webpack --mode=production"
   },
   "keywords": [],
   "author": "Cedric Fung",
