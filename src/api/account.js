@@ -18,7 +18,7 @@ Account.prototype = {
       if (resp.error) {
         return callback(resp);
       }
-      if (resp.data.scope.indexOf('ASSETS:READ') < 0 || resp.data.scope.indexOf('CONTACTS:READ') < 0) {
+      if (resp.data.scope.indexOf('COLLECTIBLES:READ') < 0 || resp.data.scope.indexOf('CONTACTS:READ') < 0) {
         resp.error = { code: 403, description: 'Access denied.' };
         return callback(resp);
       }

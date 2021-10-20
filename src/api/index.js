@@ -1,13 +1,13 @@
 import $ from 'jquery';
 import Noty from 'noty';
 import Account from './account.js';
-import Multisig from './multisig.js';
+import Collectible from './collectible.js';
 
 function API(router, root) {
   this.router = router;
   this.root = root;
   this.account = new Account(this);
-  this.multisig = new Multisig(this);
+  this.collectible = new Collectible(this);
   this.Error404 = require('../404.html');
   this.ErrorGeneral = require('../error.html');
 }
@@ -55,7 +55,7 @@ API.prototype = {
       switch (resp.error.code) {
         case 401:
           this.account.clear();
-          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+ASSETS:READ+CONTACTS:READ&response_type=code&code_challenge='+this.account.challenge());
+          window.location.replace('https://mixin.one/oauth/authorize?client_id='+CLIENT_ID+'&scope=PROFILE:READ+COLLECTIBLES:READ+CONTACTS:READ&response_type=code&code_challenge='+this.account.challenge());
           break;
         case 404:
           $('#layout-container').html(this.Error404());

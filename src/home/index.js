@@ -9,13 +9,11 @@ require('../utils/transaction.js');
 function Home(router, api) {
   this.router = router;
   this.partialLoading = require('../loading.html');
-  this.templateGuide = require('./guide.html');
   this.templateIndex = require('./index.html');
   this.templateSend = require('./send.html');
   this.templateSign = require('./sign.html');
   this.templateState = require('./state.html');
   this.templateEmpty = require('./empty.html');
-  this.templateReceive = require('./receive.html');
   this.api = api;
 }
 
@@ -27,16 +25,26 @@ Home.prototype = {
         || resp.data && resp.data.category !== 'GROUP'
         || resp.data && self.parseThreshold(resp.data.name) < 1
         || resp.data && resp.data.participants.length < 3) {
-        $('body').attr('class', 'home layout');
-        $('#layout-container').html(self.templateGuide());
+        var members = [self.api.account.me().user_id];
+        self.loadUTXOs(undefined, members, 1, {}, function (utxos) {
+          if (Object.keys(utxos).length == 0) {
+            $('body').attr('class', 'home layout');
+            $('#layout-container').html(self.templateEmpty());
+          } else {
+            self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
+              self.renderWalletForAll(resp.data, users, assets, utxos);
+            });
+          }
+        });
         return true;
       } else if (resp.data && resp.data.category === 'GROUP') {
         self.loadUsers(resp.data.participants, function (users) {
-          self.loadUTXOs(undefined, resp.data, {}, function (utxos) {
+          var members = self.memberIds(conv.participants);
+          var threshold = self.parseThreshold(conv.name);
+          self.loadUTXOs(undefined, members, threshold, {}, function (utxos) {
             if (Object.keys(utxos).length == 0) {
               $('body').attr('class', 'home layout');
               $('#layout-container').html(self.templateEmpty());
-              $('.bottom.button input:submit').click(function () {self.renderReceive(resp.data);});
             } else {
               self.loadAssets(0, Object.keys(utxos), {}, function (assets) {
                 self.renderWalletForAll(resp.data, users, assets, utxos);
@@ -50,106 +58,6 @@ Home.prototype = {
     }, new Mixin().conversationId());
   },
 
-  renderReceive: function (conv) {
-    const self = this;
-    $('#layout-container').html(self.templateReceive({
-      assets: [{
-        asset_id: 'c6d0c728-2624-429b-8e0d-d9d19b6592fa',
-        symbol: 'BTC'
-      },{
-        asset_id: '43d61dcd-e413-450d-80b8-101d5e903357',
-        symbol: 'ETH'
-      },{
-        asset_id: 'eea900a8-b327-488c-8d8d-1428702fe240',
-        symbol: 'MOB'
-      },{
-        asset_id: 'c94ac88f-4671-3976-b60a-09064f1811e8',
-        symbol: 'XIN'
-      },{
-        asset_id: '4d8c508b-91c5-375b-92b0-ee702ed2dac5',
-        symbol: 'USDT-ERC20'
-      },{
-        asset_id: '815b0b1a-2764-3736-8faa-42d694fa620a',
-        symbol: 'USDT-Omni'
-      },{
-        asset_id: 'f5ef6b5d-cc5a-3d90-b2c0-a2fd386e7a3c',
-        symbol: 'BOX'
-      },{
-        asset_id: '3edb734c-6d6f-32ff-ab03-4eb43640c758',
-        symbol: 'PRS'
-      },{
-        asset_id: '2566bf58-c4de-3479-8c55-c137bb7fe2ae',
-        symbol: 'ONE'
-      },{
-        asset_id: '9b180ab6-6abe-3dc0-a13f-04169eb34bfa',
-        symbol: 'USDC'
-      },{
-        asset_id: 'f6f1c01c-8489-3346-b127-dc0dc09b9ce7',
-        symbol: 'LINK'
-      },{
-        asset_id: 'a31e847e-ca87-3162-b4d1-322bc552e831',
-        symbol: 'UNI'
-      },{
-        asset_id: '6eece248-09db-3417-8f70-767896cf5217',
-        symbol: 'WGT'
-      },{
-        asset_id: '965e5c6e-434c-3fa9-b780-c50f43cd955c',
-        symbol: 'CNB'
-      }, {
-        asset_id: '6cfe566e-4aad-470b-8c9a-2fd35b49c68d',
-        symbol: 'EOS'
-      }, {
-        asset_id: '336d5d97-329c-330d-8e62-2b7c9ba40ea0',
-        symbol: 'IQ'
-      }, {
-        asset_id: 'f1d987df-1835-3f03-aefd-5e3e4132d11e',
-        symbol: 'HT'
-      }, {
-        asset_id: '4e7068df-a483-38af-8b16-cd83ce711184',
-        symbol: 'KEY'
-      }, {
-        asset_id: '44adc71b-0c37-3b42-aa19-fe2d59dae5fd',
-        symbol: 'EPC'
-      }, {
-        asset_id: '88b29aef-6059-3351-abbd-0ecfcc574280',
-        symbol: 'GRT'
-      }, {
-        asset_id: 'ceeaa170-b2fe-3bc1-91a5-5ffa468a1f33',
-        symbol: 'LEO'
-      }, {
-        asset_id: '31d2ea9c-95eb-3355-b65b-ba096853bc18',
-        symbol: 'pUSD'
-      }],
-      trace_id: uuidv4()
-    }));
-    $('form').submit(function (event) {
-      event.preventDefault();
-      var params = new FormUtils().serialize($(this));
-      params.opponent_multisig = { receivers: [], threshold: self.parseThreshold(conv.name) };
-      for (var i in conv.participants) {
-        var id = conv.participants[i].user_id;
-        if (id === CLIENT_ID) {
-          continue;
-        }
-        params.opponent_multisig.receivers.push(id);
-      }
-      console.log(params);
-      self.api.request('POST', '/payments', params, function (resp) {
-        if (resp.error) {
-          return;
-        }
-        console.log(resp.data);
-        var text = `https://mixin.one/codes/${resp.data.code_id}`;
-        window.location = `mixin://send?text=${encodeURIComponent(text)}`;
-      });
-    });
-    $('input[type=submit]').click(function (event) {
-      event.preventDefault();
-      $('.submitting.overlay').show();
-      $(this).parents('form').submit();
-    });
-  },
-
   renderWalletForAll: function (conv, users, assets, utxos) {
     const self = this;
     var assetsView = [];
@@ -159,7 +67,6 @@ Home.prototype = {
     }
     $('body').attr('class', 'home layout');
     $('#layout-container').html(self.templateIndex({assets: assetsView}));
-    $('.bottom.button input:submit').click(function () {self.renderReceive(conv);});
     $('.assets.list .wallet.item').on('click', function (e) {
       e.preventDefault();
       var id = $(this).attr('data-id');
@@ -361,7 +268,7 @@ Home.prototype = {
   },
 
   createMultisigRequest: function(raw, action, callback) {
-    this.api.request('POST', '/multisigs/requests', {raw: raw, action: action}, function (resp) {
+    this.api.request('POST', '/collectibles/requests', {raw: raw, action: action}, function (resp) {
       if (resp.error) {
         return;
       }
@@ -378,12 +285,10 @@ Home.prototype = {
     });
   },
 
-  loadUTXOs: function (offset, conv, filter, callback) {
+  loadUTXOs: function (offset, members, threshold, filter, callback) {
     const self = this;
-    var key = self.makeUnique(conv.participants);
-    var members = self.memberIds(conv.participants);
-    var threshold = self.parseThreshold(conv.name);
-    self.api.multisig.list(function (resp) {
+    var key = members.sort().join('');
+    self.api.collectible.list(function (resp) {
       if (resp.error) {
         return false;
       }
@@ -406,7 +311,7 @@ Home.prototype = {
       if (resp.data.length < 100) {
         return callback(filter);
       }
-      self.loadUTXOs(resp.data[resp.data.length-1].created_at, conv, filter, callback);
+      self.loadUTXOs(resp.data[resp.data.length-1].created_at, members, threshold, filter, callback);
     }, members, threshold, offset, 100);
   },
 

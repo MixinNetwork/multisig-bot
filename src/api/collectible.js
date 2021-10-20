@@ -1,13 +1,13 @@
 import { SHA3 } from 'sha3';
 
-function Multisig(api) {
+function Collectible(api) {
   this.api = api;
 }
 
-Multisig.prototype = {
+Collectible.prototype = {
   list: function (callback, members, threshold, offset, limit) {
     const self = this;
-    var path = '/multisigs/outputs?offset=' + offset + '&limit=' + limit + '&members=' + self.hashMembers(members) + '&threshold=' + threshold;
+    var path = '/collectibles/outputs?offset=' + offset + '&limit=' + limit + '&members=' + self.hashMembers(members) + '&threshold=' + threshold;
     this.api.request('GET', path, undefined, function(resp) {
       return callback(resp);
     });
@@ -21,4 +21,4 @@ Multisig.prototype = {
   },
 };
 
-export default Multisig;
+export default Collectible;
