@@ -23,17 +23,12 @@
       <input type="number" name="threshold" />
     </div>
     <div class="field">
-      <label for="amount">Amount (#{{asset.token}})</label>
+      <label for="amount">Amount (#{{token.token}})</label>
       <input type="number" step="1" name="amount" />
     </div>
     <div class="field">
-      <label for="memo">Memo</label>
-      <input type="text" name="memo" />
+      <input type="submit" value="Send {{token.meta.name}}" />
     </div>
-    <div class="field">
-      <input type="submit" value="Send {{asset.meta.name}}" />
-    </div>
-    <input type="hidden" value="{{asset.token_id}}" name="token_id" />
   </fieldset>
 </form>
 

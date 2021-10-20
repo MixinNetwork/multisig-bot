@@ -69,14 +69,14 @@ Home.prototype = {
       $('body').attr('class', 'loading layout');
       $('#layout-container').html(self.partialLoading());
       self.loadContacts(function (contacts) {
-        self.renderWalletForAsset(tokens[id], utxos[id], contacts);
+        self.renderWalletForToken(tokens[id], utxos[id], contacts);
       });
     });
   },
 
-  renderWalletForAsset: function (asset, utxos, contacts) {
+  renderWalletForToken: function (token, utxos, contacts) {
     const self = this;
-    if (Decimal.sign(asset.signed) > 0) {
+    if (Decimal.sign(token.signed) > 0) {
       var utxo = undefined;
       for (var i in utxos) {
         if (utxos[i].signed_tx.length > 0) {
@@ -110,7 +110,7 @@ Home.prototype = {
           multi.senders = senders;
           multi.receivers = receivers;
           multi.signers = signers;
-          multi.asset = asset;
+          multi.token = token;
           multi.finished = signers.length >= utxo.receivers_threshold;
           console.log(multi);
           $('body').attr('class', 'home layout');
@@ -145,7 +145,7 @@ Home.prototype = {
     } else {
       contacts.push(self.api.account.me());
       $('body').attr('class', 'home layout');
-      $('#layout-container').html(self.templateSend({contacts: contacts, asset: asset}));
+      $('#layout-container').html(self.templateSend({contacts: contacts, token: token}));
       $('form').submit(function (event) {
         event.preventDefault();
         var members = [];
@@ -154,10 +154,10 @@ Home.prototype = {
         });
         var tx = {
           version: 2,
-          asset: asset.mixin_id,
+          asset: token.mixin_id,
           inputs: [],
           outputs: [],
-          extra: self.toHex($('input[name="memo"]').val()),
+          extra: token.nfo,
         };
         var inputAmount = new Decimal(0), amount = new Decimal($('input[name="amount"]').val());
         for (var i in utxos) {

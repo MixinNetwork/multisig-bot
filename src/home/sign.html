@@ -10,12 +10,8 @@
       <textarea name="raw" disabled>{{raw_transaction}}</textarea>
     </div>
     <div class="field">
-      <label for="amount">Amount ({{asset.symbol}})</label>
+      <label for="amount">Amount ({{token.token}})</label>
       <input type="number" name="amount" value="{{amount}}" disabled />
-    </div>
-    <div class="field">
-      <label for="memo">Memo</label>
-      <input type="text" name="memo" value="{{memo}}" disabled />
     </div>
     <div class="field receivers">
       <label>Receivers</label>
