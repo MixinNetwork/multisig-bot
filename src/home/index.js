@@ -144,6 +144,11 @@ Home.prototype = {
       });
     } else {
       contacts.push(self.api.account.me());
+      contacts.sort(function (a, b) {
+        var ai = parseInt(a.identity_number);
+        var bi = parseInt(b.identity_number)
+        return ai < bi;
+      });
       $('body').attr('class', 'home layout');
       $('#layout-container').html(self.templateSend({contacts: contacts, token: token}));
       $('form').submit(function (event) {
