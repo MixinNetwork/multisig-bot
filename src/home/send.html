@@ -22,10 +22,14 @@
       <label for="threshold">Threshold</label>
       <input type="number" name="threshold" />
     </div>
+    {{#if token.isMetaToken}}
     <div class="field">
       <label for="amount">Amount (#{{token.token}})</label>
       <input type="number" step="1" name="amount" />
     </div>
+    {{else}}
+    <input type="hidden" name="amount" value="1" />
+    {{/if}}
     <div class="field">
       <input type="submit" value="Send {{token.meta.name}}" />
     </div>

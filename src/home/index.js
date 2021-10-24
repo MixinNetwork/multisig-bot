@@ -149,6 +149,7 @@ Home.prototype = {
         var bi = parseInt(b.identity_number)
         return ai < bi;
       });
+      token.isMetaToken = token.token_id === '2f8aa18a-3cb8-31d5-95bc-5a4f2e25dc2f';
       $('body').attr('class', 'home layout');
       $('#layout-container').html(self.templateSend({contacts: contacts, token: token}));
       $('form').submit(function (event) {
