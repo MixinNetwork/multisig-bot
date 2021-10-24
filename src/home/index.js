@@ -348,20 +348,22 @@ Home.prototype = {
   },
 
   loadTokens: function (offset, ids, output, callback) {
-    const self = this;
-    const key = ids.sort().join('');
-    var tokens = localStorage.getItem(key);
-    if (tokens) {
-      return callback(JSON.parse(tokens));
-    }
-    if (offset === ids.length) {
-      localStorage.setItem(key, JSON.stringify(output));
+    if (offset == ids.length) {
       return callback(output);
+    }
+    const self = this;
+    const key = 'token-' + ids[offset];
+    var token = localStorage.getItem(key);
+    if (token) {
+      output[ids[offset]] = JSON.parse(token);
+      return self.loadTokens(offset+1, ids, output, callback);
     }
     self.api.request('GET', '/collectibles/tokens/' + ids[offset], undefined, function (resp) {
       if (resp.error) {
         return false;
       }
+      var key = 'token-' + resp.data.token_id;
+      localStorage.setItem(key, JSON.stringify(resp.data));
       output[resp.data.token_id] = resp.data;
       self.loadTokens(offset+1, ids, output, callback);
     });
