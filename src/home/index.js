@@ -236,6 +236,8 @@ Home.prototype = {
       if (resp.error && resp.error.code === 404) {
         $('#layout-container').html(self.templateState({status: 'close'}));
       } else if (resp.data && resp.data.state !== 'initial') {
+        var params = {method: "sendrawtransaction", params: [resp.data.raw_transaction]};
+        self.api.request('POST', '/external/proxy', params, function (resp) {});
         $('#layout-container').html(self.templateState({status: 'check'}));
       } else {
         setTimeout(function() { self.waitForAction(codeId); }, 1500);
