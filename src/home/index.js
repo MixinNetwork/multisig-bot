@@ -254,6 +254,7 @@ Home.prototype = {
         signed = signed.add(new Decimal(utxos[id].amount));
       }
     }
+    asset.meta.icon_url = generateIdenticon(asset.meta.hash);
     asset.total = total.toString();
     asset.signed = signed.toString();
     asset.pending = pending.toString();
@@ -438,3 +439,80 @@ Home.prototype = {
 };
 
 export default Home;
+
+// see code in action: https://jsfiddle.net/desaroxx/jp4pmd2u/
+
+/* Configuration variables */
+var MAX_COLOR 		= 16;				// Max value for a color component
+var MIN_COLOR 		= 200; 				// Min value for a color component
+var SQUARE 		= 32; 				// Size of a grid square in pixels
+var GRID 		= 8; 				// Number of squares width and height
+var PADDING 		= SQUARE / 2; 			// Padding on the edge of the canvas in px
+var SIZE 		= SQUARE * GRID + PADDING * 2; 	// Size of the canvas
+var FILL_COLOR 		= '#F0ECE6';			// canvas background color
+
+/* Create a temporary canvas */
+function setupCanvas() {
+  var canvas = document.createElement('canvas');
+  canvas.width = SIZE;
+  canvas.height = SIZE;
+
+  // Fill canvas background
+  var context = canvas.getContext('2d');
+  context.beginPath();
+  context.rect(0, 0, SIZE, SIZE);
+  context.fillStyle = FILL_COLOR;
+  context.fill();
+  return canvas;
+}
+
+/* Fill in a square of the canvas */
+function fillBlock(x, y, color, context) {
+  context.beginPath();
+  context.rect(PADDING + x * SQUARE, PADDING + y * SQUARE, SQUARE, SQUARE);
+  context.fillStyle = 'rgb(' + color.join(',') + ')';
+  context.fill();
+}
+
+/* Generate a random color with low saturation. */
+function generateColor(val) {
+  var rgb = [ ];
+  for (var i = 1; i <= 3; i++) {
+    var e = (val * i * i) % 255;
+    rgb.push(e);
+  }
+  return rgb;
+};
+
+/* Generate a random identicon */
+function generateIdenticon(hex) {
+  var bytes = hexToBytes(hex);
+  var canvas = setupCanvas();
+  var context = canvas.getContext('2d');
+
+  // Iterate through squares on left side
+  for (var x = 0; x < Math.ceil(GRID / 2); x++) {
+    for (var y = 0; y < GRID; y++) {
+      // Randomly fill squares
+      var bi = bytes[x * GRID + y];
+      var color = generateColor(bi);
+      if (bi % 3 > 0) {
+        fillBlock(x, y, color, context);
+
+        // Fill right side symmetrically
+        if (x < Math.floor(GRID / 2)) {
+          fillBlock((GRID - 1) - x, y, color, context);
+        }
+      }
+    }
+  }
+  return canvas.toDataURL();
+}
+
+// Convert a hex string to a byte array
+function hexToBytes(hex) {
+  for (var bytes = [], c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
+}
