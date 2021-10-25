@@ -146,8 +146,8 @@ Home.prototype = {
       contacts.push(self.api.account.me());
       contacts.sort(function (a, b) {
         var ai = parseInt(a.identity_number);
-        var bi = parseInt(b.identity_number)
-        return ai < bi;
+        var bi = parseInt(b.identity_number);
+        return ai - bi;
       });
       token.isMetaToken = token.token_id === '2f8aa18a-3cb8-31d5-95bc-5a4f2e25dc2f';
       $('body').attr('class', 'home layout');
