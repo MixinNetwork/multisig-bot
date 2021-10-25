@@ -2,8 +2,8 @@
   <fieldset>
     {{#each contacts}}
     <div class="field user">
-      <input type="checkbox" name="checkbox-{{user_id}}" id="checkbox-{{user_id}}" value="{{user_id}}">
-      <label for="checkbox-{{user_id}}">
+      <input type="radio" name="receiver" id="radio-{{user_id}}" value="{{user_id}}">
+      <label for="radio-{{user_id}}">
         <div class="user avatar">
           {{#if firstLetter}}
           <p>{{firstLetter}}</p>
@@ -18,10 +18,7 @@
       </label>
     </div>
     {{/each}}
-    <div class="field">
-      <label for="threshold">Threshold</label>
-      <input type="number" name="threshold" />
-    </div>
+    <input type="hidden" value="1" name="threshold" />
     {{#if token.isMetaToken}}
     <div class="field">
       <label for="amount">Amount (#{{token.token}})</label>
