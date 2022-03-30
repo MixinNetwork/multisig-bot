@@ -254,7 +254,9 @@ Home.prototype = {
         signed = signed.add(new Decimal(utxos[id].amount));
       }
     }
-    asset.meta.icon_url = generateIdenticon(asset.meta.hash);
+    if (asset.meta.icon_url.indexOf('zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA') > 0) {
+      asset.meta.icon_url = generateIdenticon(asset.meta.hash);
+    }
     asset.total = total.toString();
     asset.signed = signed.toString();
     asset.pending = pending.toString();
