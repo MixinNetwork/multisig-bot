@@ -10,7 +10,7 @@
     "favicons": "^6.2.2",
     "handlebars": "^4.7.7",
     "jquery": "^3.6.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "navigo": "^8.11.1",
     "node-polyglot": "^2.4.0",
     "noty": "^3.2.0-beta",
